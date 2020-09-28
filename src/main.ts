@@ -54,8 +54,26 @@ import { getCredentials, connectTM, connectOBS } from "./authenticate";
 
     if (message.type === "fieldMatchAssigned") {
       const id = message.fieldId;
+
+      // Elims won't have an assigned field, they can switch early, but we'll
+      // switch when the match starts
+      if (!id) {
+        return;
+      }
+
       console.log(
         `${message.name} queued on ${fields[id - 1].name}, switching to scene ${
+          associations[id]
+        }`
+      );
+      await obs.send("SetCurrentScene", { "scene-name": associations[id] });
+
+      // Force the scene to switch when the match starts
+    } else if (message.type === "matchStarted") {
+      const id = message.fieldId;
+
+      console.log(
+        `Match started on ${fields[id - 1].name}, switching to scene ${
           associations[id]
         }`
       );

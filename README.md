@@ -3,6 +3,8 @@
 This is small tool to automatically switch scenes in OBS when VEX Tournament
 Manager queues up a new match on a fieldset.
 
+![image](https://user-images.githubusercontent.com/8839926/153454145-18752edc-5022-4fa5-a0eb-538dfd4a5a1e.png)
+
 ## Requirements
 
 - [OBS WebSocket

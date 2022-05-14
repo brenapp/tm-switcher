@@ -1,35 +1,25 @@
 import inquirer from "inquirer";
+import ObsWebSocket from "obs-websocket-js";
+import Client from "vex-tm-client";
 import Fieldset, { Field } from "vex-tm-client/out/Fieldset";
 import { getCredentials, connectTM, connectOBS } from "./authenticate";
 
-(async function () {
-  // Prompt the user for credentials
-  const creds = await getCredentials();
-
-  console.log("\nConnecting to servers...");
-
-  const tm = await connectTM(creds.tm);
-  console.log("✅ Tournament Manager");
-
-  const obs = await connectOBS(creds.obs);
-  console.log("✅ Open Broadcaster Studio");
-
-  console.log("");
-
-  // Have the user select a division
-  let response = await inquirer.prompt([
+async function getFieldset(tm: Client) {
+   let response = await inquirer.prompt([
     {
       name: "fieldset",
       type: "list",
-      message: "Select Fieldset to Control",
+      message: "Which fieldset do you wish to control? ",
       choices: tm.fieldsets.map((d) => d.name),
     },
   ]);
-  const fieldset = tm.fieldsets.find(
+
+  return tm.fieldsets.find(
     (set) => set.name === response.fieldset
   ) as Fieldset;
+};
 
-  // Set up associations between scenes and fields
+async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
   const fields = fieldset.fields;
   const scenes = await obs.send("GetSceneList");
 
@@ -45,9 +35,43 @@ import { getCredentials, connectTM, connectOBS } from "./authenticate";
       },
     ]);
     associations[field.id] = response.scene;
-  }
+  };
 
+  return associations;
+};
+
+function toTime(seconds: number) {
+  let minutes = Math.floor(seconds / 60);
+  let secondsLeft = seconds % 60;
+
+  // Pad with 0s
+  let minuteString = minutes < 10 ? `0${minutes}` : `${minutes}`;
+  let secondString = minutes < 10 ? `0${seconds}` : `${seconds}`;
+
+  return `${minuteString}:${secondString}`;
+};
+
+(async function () {
+
+  // Prompt the user for credentials
+  const creds = await getCredentials();
+
+  console.log("\nConnecting to servers...");
+
+  const tm = await connectTM(creds.tm);
+  console.log("✅ Tournament Manager");
+
+  const obs = await connectOBS(creds.obs);
+  console.log("✅ Open Broadcaster Studio\n");
+
+  // Configuration
+  const fieldset = await getFieldset(tm);
+  const fields = fieldset.fields;
+  const associations = await getAssociations(fieldset, obs);
   console.log("Done!");
+
+  // Bottom Bar for Match Status
+  const status = new inquirer.ui.BottomBar();
 
   fieldset.ws.on("message", async (data) => {
     const message = JSON.parse(data.toString());
@@ -78,6 +102,9 @@ import { getCredentials, connectTM, connectOBS } from "./authenticate";
         }`
       );
       await obs.send("SetCurrentScene", { "scene-name": associations[id] });
-    }
+
+
+    // Update the bottom bar timer
+    };
   });
 })();

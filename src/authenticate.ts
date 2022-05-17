@@ -69,7 +69,14 @@ export async function connectTM({
   try {
     await client.connect();
   } catch (e: any) {
-    console.log(e.message);
+    console.log("❌ Tournament Manager: " + e.message);
+
+    if (e.message.includes("cookie")) {
+      console.log("\nCould not automatically generate cookie. Check to ensure you are connecting to the correct address.");
+    } else if (e.message.includes("ECONNREFUSED")) {
+      console.log("\nCould not connect to the Tournament Manager server. Ensure you have started it and that the address is correct. ");
+    };
+
     process.exit(1);
   }
 
@@ -82,8 +89,13 @@ export async function connectOBS(creds: { address: string; password: string }) {
 
   return new Promise<OBSWebSocket>((resolve, reject) => {
     obs.on("ConnectionOpened", () => resolve(obs));
-    obs.on("AuthenticationFailure", () => reject("Authentication failed"));
-    obs.on("ConnectionClosed", () => reject("Connection closed"));
-    obs.on("Exiting", () => reject("Connection closed"));
+    obs.on("AuthenticationFailure", () => {
+      console.log("❌ Open Broadcaster Studio: Authentication failure");
+      process.exit(1);
+    });
+    obs.on("ConnectionClosed", () => {
+      console.log("❌ Open Broadcaster Studio: Connection closed by remote");
+      process.exit(1);
+    });
   });
 }

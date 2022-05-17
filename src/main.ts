@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import ObsWebSocket from "obs-websocket-js";
 import Client from "vex-tm-client";
-import Fieldset from "vex-tm-client/out/Fieldset";
+import Fieldset, { AudienceDisplayMode } from "vex-tm-client/out/Fieldset";
 import { getCredentials, connectTM, connectOBS } from "./authenticate";
 
 async function getFieldset(tm: Client) {
@@ -88,7 +88,9 @@ async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
       };
 
       console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching to scene ${associations[id]}`);
+      
       await obs.send("SetCurrentScene", { "scene-name": associations[id] });
+      fieldset.setScreen(AudienceDisplayMode.INTRO);
 
       // Force the scene to switch when the match starts
     } else if (message.type === "matchStarted") {
@@ -99,9 +101,9 @@ async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
         name = "Unknown";
       };
 
-      console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} started on ${name}, switching to scene ${associations[id]}`);
+      console.log(`[${new Date().toISOString()}] [${timecode}] info: match started on ${name}, switching to scene ${associations[id]}`);
       await obs.send("SetCurrentScene", { "scene-name": associations[id] });
-
+      fieldset.setScreen(AudienceDisplayMode.IN_MATCH);
     };
   });
 })();

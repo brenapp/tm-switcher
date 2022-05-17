@@ -3,6 +3,9 @@ import ObsWebSocket from "obs-websocket-js";
 import Client from "vex-tm-client";
 import Fieldset, { AudienceDisplayMode, AudienceDisplayOptions } from "vex-tm-client/out/Fieldset";
 import { getCredentials, connectTM, connectOBS } from "./authenticate";
+import getPath from "platform-folders";
+import { join } from "path";
+import { promises as fs } from "fs";
 
 async function getFieldset(tm: Client) {
   const response: { fieldset: string } = await inquirer.prompt([
@@ -66,6 +69,30 @@ async function getAudienceDisplayOptions() {
   return flags;
 };
 
+async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> {
+
+  const response: { record: boolean } = await inquirer.prompt([
+    {
+      name: "record",
+      type: "confirm",
+      message: "Save a file with stream timestamps for each match?"
+    }
+  ]);
+
+  if (response.record) {
+    const directory = getPath("desktop") ?? getPath("documents") ?? getPath("home") as string;
+    const path = join(directory, `obs_switcher_${new Date().toISOString()}_times.csv`);
+
+    console.log(`  Will save match stream times to ${path}`);
+    const handle = await fs.open(path, "w");
+
+    handle.write("TIMESTAMP,OBS_TIME,MATCH\n");
+
+    return handle
+  } else {
+    return undefined;
+  }
+};
 
 (async function () {
 
@@ -85,7 +112,11 @@ async function getAudienceDisplayOptions() {
   const fields = new Map(fieldset.fields.map((f) => [f.id, f]));
   const associations = await getAssociations(fieldset, obs);
   const audienceDisplayOptions = await getAudienceDisplayOptions();
-  console.log("Done!");
+  const timestampFile = await getRecordingPath(tm);
+  console.log("Done!\n");
+
+  let queued = "";
+  let started = false;
 
   fieldset.ws.on("message", async (data) => {
     const message = JSON.parse(data.toString());
@@ -121,6 +152,10 @@ async function getAudienceDisplayOptions() {
         fieldset.setScreen(AudienceDisplayMode.INTRO);
       }
 
+      // keep track of the queued match
+      queued = message.name;
+      started = false;
+
       // Force the scene to switch when the match starts
     } else if (message.type === "matchStarted") {
       const id = message.fieldId;
@@ -130,8 +165,13 @@ async function getAudienceDisplayOptions() {
         name = "Unknown";
       };
 
-      console.log(`[${new Date().toISOString()}] [${timecode}] info: match started on ${name}, switching to scene ${associations[id]}`);
+      console.log(`[${new Date().toISOString()}] [${timecode}] info: match ${started ? "resumed" : "started"} on ${name}, switching to scene ${associations[id]}`);
       await obs.send("SetCurrentScene", { "scene-name": associations[id] });
+
+      if (!started) {
+        started = true;
+        timestampFile?.write(`${new Date().toISOString()},${timecode},${queued}\n`);
+      }
 
     } else if (message.type === "timeUpdated") {
 
@@ -144,8 +184,8 @@ async function getAudienceDisplayOptions() {
 
       // Show saved score 3 seconds after the match ends
       if (audienceDisplayOptions.savedScore) {
-        console.log(`[${new Date().toISOString()}] info: switching audience display to Saved Match Results`);
         setTimeout(() => {
+          console.log(`[${new Date().toISOString()}] info: switching audience display to Saved Match Results`);
           fieldset.setScreen(AudienceDisplayMode.SAVED_MATCH_RESULTS);
         }, 3000);
       };

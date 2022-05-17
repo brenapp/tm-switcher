@@ -12,6 +12,7 @@
     "@types/inquirer": "^7.3.1",
     "inquirer": "^7.3.3",
     "obs-websocket-js": "^4.0.3",
+    "platform-folders": "^0.6.0",
     "vex-tm-client": "^0.2.2"
   },
   "devDependencies": {

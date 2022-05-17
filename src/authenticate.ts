@@ -99,7 +99,7 @@ export async function connectOBS(creds: { address: string; password: string }) {
     await obs.connect(creds);
     return obs;
   } catch (e: any) {
-    console.log("❌ Open Broadcaster Studio: " + e.message);
+    console.log("❌ Open Broadcaster Studio: ", e);
 
     await keypress();
     process.exit(1);

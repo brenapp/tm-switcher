@@ -94,19 +94,14 @@ export async function connectTM({
 
 export async function connectOBS(creds: { address: string; password: string }) {
   const obs = new OBSWebSocket();
-  obs.connect(creds);
+  
+  try {
+    await obs.connect(creds);
+    return obs;
+  } catch (e: any) {
+    console.log("❌ Open Broadcaster Studio: " + e.message);
 
-  return new Promise<OBSWebSocket>((resolve, reject) => {
-    obs.on("ConnectionOpened", () => resolve(obs));
-    obs.on("AuthenticationFailure", async () => {
-      console.log("❌ Open Broadcaster Studio: Authentication failure");
-      await keypress();
-      process.exit(1);
-    });
-    obs.on("ConnectionClosed", async () => {
-      console.log("❌ Open Broadcaster Studio: Connection closed by remote");
-      await keypress();
-      process.exit(1);
-    });
-  });
+    await keypress();
+    process.exit(1);
+  };
 }

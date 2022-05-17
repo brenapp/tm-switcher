@@ -5,18 +5,17 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "bundle": "pkg out/main.js --out-path bundle",
+    "bundle": "pkg outg/main.js --out-path bundle --targets node16-macos-x64,node16-win-x64,node16-linux-x64",
     "run": "node out/main.js"
   },
   "dependencies": {
     "@types/inquirer": "^7.3.1",
     "inquirer": "^7.3.3",
-    "obs-websocket-js": "^4.0.3",
-    "platform-folders": "^0.6.0",
-    "vex-tm-client": "^0.2.2"
+    "obs-websocket-js": "^4.0.2",
+    "vex-tm-client": "^0.0.1"
   },
   "devDependencies": {
-    "pkg": "^5.6.0",
+    "pkg": "^4.4.9",
     "typescript": "^4.0.3"
   }
 }

@@ -45,11 +45,12 @@ async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
 
 async function getAudienceDisplayOptions() {
 
-  type Choices = "queueIntro" | "preventSwitch" | "savedScore";
+  type Choices = "queueIntro" | "preventSwitch" | "savedScore" | "rankings";
   const choices: { name: string; value: Choices }[] = [
     { name: "Show Intro on Match Queue", value: "queueIntro" },
     { name: "Prevent Switching Display Mode In Match", value: "preventSwitch" },
     { name: "Show Saved Score 3 Seconds After Match", value: "savedScore" },
+    { name: "Flash rankings after every 6th match", value: "rankings" }
   ];
 
   const response: { options: Choices[] } = await inquirer.prompt([
@@ -123,6 +124,7 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
 
   let queued = "";
   let started = false;
+  let matchCount = 0;
 
   fieldset.ws.on("message", async (data) => {
     const message = JSON.parse(data.toString());
@@ -188,8 +190,15 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
 
     } else if (message.type === "matchStopped") {
 
+      matchCount++;
+
       // Show saved score 3 seconds after the match ends
-      if (audienceDisplayOptions.savedScore) {
+      if (audienceDisplayOptions.rankings && matchCount % 6 == 0) {
+        setTimeout(() => {
+          console.log(`[${new Date().toISOString()}] info: switching audience display to Rankings`);
+          fieldset.setScreen(AudienceDisplayMode.RANKINGS);
+        }, 3000);
+      } else if (audienceDisplayOptions.savedScore) {
         setTimeout(() => {
           console.log(`[${new Date().toISOString()}] info: switching audience display to Saved Match Results`);
           fieldset.setScreen(AudienceDisplayMode.SAVED_MATCH_RESULTS);

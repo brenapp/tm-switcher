@@ -40,6 +40,32 @@ async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
   return associations;
 };
 
+async function getAudienceDisplayOptions() {
+
+  type Choices = "queueIntro" | "preventSwitch" | "savedScore";
+  const choices: { name: string; value: Choices }[] = [
+    { name: "Show Intro on Match Queue", value: "queueIntro" },
+    { name: "Prevent Switching Display Mode In Match", value: "preventSwitch" },
+    { name: "Show Saved Score 3 Seconds After Match", value: "savedScore" },
+  ];
+
+  const response: { options: Choices[] } = await inquirer.prompt([
+    {
+      name: "options",
+      type: "checkbox",
+      message: "Which audience display automation would you like to enable?",
+      choices
+    }
+  ]);
+
+  const flags = Object.fromEntries(choices.map(ch => [ch.value, false])) as Record<Choices, boolean>;
+  for (const option of response.options) {
+    flags[option] = true;
+  };
+
+  return flags;
+};
+
 
 (async function () {
 
@@ -58,6 +84,7 @@ async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
   const fieldset = await getFieldset(tm);
   const fields = new Map(fieldset.fields.map((f) => [f.id, f]));
   const associations = await getAssociations(fieldset, obs);
+  const audienceDisplayOptions = await getAudienceDisplayOptions();
   console.log("Done!");
 
   fieldset.ws.on("message", async (data) => {
@@ -88,9 +115,12 @@ async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
       };
 
       console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching to scene ${associations[id]}`);
-      
+
       await obs.send("SetCurrentScene", { "scene-name": associations[id] });
-      fieldset.setScreen(AudienceDisplayMode.INTRO);
+      
+      if (audienceDisplayOptions.queueIntro) {
+        fieldset.setScreen(AudienceDisplayMode.INTRO);
+      }
 
       // Force the scene to switch when the match starts
     } else if (message.type === "matchStarted") {
@@ -103,7 +133,23 @@ async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
 
       console.log(`[${new Date().toISOString()}] [${timecode}] info: match started on ${name}, switching to scene ${associations[id]}`);
       await obs.send("SetCurrentScene", { "scene-name": associations[id] });
-      fieldset.setScreen(AudienceDisplayMode.IN_MATCH);
+
+    } else if (message.type === "timeUpdated") {
+      
+      // Force the audience display to be in-match during the entire match
+      if (audienceDisplayOptions.preventSwitch) {
+        fieldset.setScreen(AudienceDisplayMode.IN_MATCH);
+      };
+    
+    } else if (message.type === "matchStopped") {
+
+      // Show saved score 3 seconds after the match ends
+      if (audienceDisplayOptions.savedScore) {
+        console.log(`[${new Date().toISOString()}] info: switching audience display to Saved Match Results`);
+        setTimeout(() => {
+          fieldset.setScreen(AudienceDisplayMode.SAVED_MATCH_RESULTS);
+        }, 3000);
+      };
     };
   });
 })();

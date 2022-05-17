@@ -212,8 +212,9 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
       // Disable show saved score when you switch display to elim bracket or alliance selection
       if (mode == AudienceDisplayMode.ELIM_BRACKET || mode == AudienceDisplayMode.ALLIANCE_SELECTION) {
         if (audienceDisplayOptions.savedScore) {
-          console.log(`[${new Date().toISOString()}] info: detected switch to ${AudienceDisplayMode[mode]}, disabling show saved score after match ends`);
+          console.log(`[${new Date().toISOString()}] info: detected switch to ${AudienceDisplayMode[mode]}, disabling show saved score & rankings automation`);
           audienceDisplayOptions.savedScore = false;
+          audienceDisplayOptions.rankings = false;
         };
       };
 

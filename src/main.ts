@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import ObsWebSocket from "obs-websocket-js";
 import Client from "vex-tm-client";
-import Fieldset, { Field } from "vex-tm-client/out/Fieldset";
+import Fieldset from "vex-tm-client/out/Fieldset";
 import { getCredentials, connectTM, connectOBS } from "./authenticate";
 
 async function getFieldset(tm: Client) {
@@ -62,6 +62,17 @@ async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
 
   fieldset.ws.on("message", async (data) => {
     const message = JSON.parse(data.toString());
+
+    const status = await obs.send("GetStreamingStatus");
+
+    // Get the current "stream time" in seconds
+    let timecode = "00:00:00";
+    if (status.recording) {
+      timecode = (status["rec-timecode"] ?? "00:00:00").split(".")[0];
+    } else if (status.streaming) {
+      timecode = (status["stream-timecode"] ?? "00:00:00").split(".")[0];
+    }
+
     if (message.type === "fieldMatchAssigned") {
       const id = message.fieldId;
 
@@ -76,13 +87,21 @@ async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
         name = "Unknown";
       };
 
-      console.log(`${message.name} queued on ${name}, switching to scene ${associations[id]}`);
+      console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching to scene ${associations[id]}`);
       await obs.send("SetCurrentScene", { "scene-name": associations[id] });
 
       // Force the scene to switch when the match starts
     } else if (message.type === "matchStarted") {
       const id = message.fieldId;
+
+      let name = fields.get(id)?.name;
+      if (!name) {
+        name = "Unknown";
+      };
+
+      console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} started on ${name}, switching to scene ${associations[id]}`);
       await obs.send("SetCurrentScene", { "scene-name": associations[id] });
+
     };
   });
 })();

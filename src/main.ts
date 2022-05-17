@@ -47,10 +47,10 @@ async function getAudienceDisplayOptions() {
 
   type Choices = "queueIntro" | "preventSwitch" | "savedScore" | "rankings";
   const choices: { name: string; value: Choices }[] = [
-    { name: "Show Intro on Match Queue", value: "queueIntro" },
-    { name: "Prevent Switching Display Mode In Match", value: "preventSwitch" },
-    { name: "Show Saved Score 3 Seconds After Match", value: "savedScore" },
-    { name: "Flash rankings after every 6th match", value: "rankings" }
+    { name: "Show intro upon match queue", value: "queueIntro" },
+    { name: "Prevent switching display mode in-match", value: "preventSwitch" },
+    { name: "Show saved score 3 seconds after match", value: "savedScore" },
+    { name: "Flash rankings 3 seconds after every 6th match", value: "rankings" }
   ];
 
   const response: { options: Choices[] } = await inquirer.prompt([

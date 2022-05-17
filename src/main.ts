@@ -1,7 +1,7 @@
 import inquirer from "inquirer";
 import ObsWebSocket from "obs-websocket-js";
 import Client from "vex-tm-client";
-import Fieldset, { AudienceDisplayMode } from "vex-tm-client/out/Fieldset";
+import Fieldset, { AudienceDisplayMode, AudienceDisplayOptions } from "vex-tm-client/out/Fieldset";
 import { getCredentials, connectTM, connectOBS } from "./authenticate";
 
 async function getFieldset(tm: Client) {
@@ -89,7 +89,6 @@ async function getAudienceDisplayOptions() {
 
   fieldset.ws.on("message", async (data) => {
     const message = JSON.parse(data.toString());
-
     const status = await obs.send("GetStreamingStatus");
 
     // Get the current "stream time" in seconds
@@ -117,7 +116,7 @@ async function getAudienceDisplayOptions() {
       console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching to scene ${associations[id]}`);
 
       await obs.send("SetCurrentScene", { "scene-name": associations[id] });
-      
+
       if (audienceDisplayOptions.queueIntro) {
         fieldset.setScreen(AudienceDisplayMode.INTRO);
       }
@@ -135,12 +134,12 @@ async function getAudienceDisplayOptions() {
       await obs.send("SetCurrentScene", { "scene-name": associations[id] });
 
     } else if (message.type === "timeUpdated") {
-      
+
       // Force the audience display to be in-match during the entire match
       if (audienceDisplayOptions.preventSwitch) {
         fieldset.setScreen(AudienceDisplayMode.IN_MATCH);
       };
-    
+
     } else if (message.type === "matchStopped") {
 
       // Show saved score 3 seconds after the match ends
@@ -150,6 +149,19 @@ async function getAudienceDisplayOptions() {
           fieldset.setScreen(AudienceDisplayMode.SAVED_MATCH_RESULTS);
         }, 3000);
       };
+
+    } else if (message.type === "displayUpdated") {
+      const mode = message.display as AudienceDisplayMode;
+      const option = message.displayOption as AudienceDisplayOptions;
+
+      // Disable show saved score when you switch display to elim bracket or alliance selection
+      if (mode == AudienceDisplayMode.ELIM_BRACKET || mode == AudienceDisplayMode.ALLIANCE_SELECTION) {
+        if (audienceDisplayOptions.savedScore) {
+          console.log(`[${new Date().toISOString()}] info: detected switch to ${AudienceDisplayMode[mode]}, disabling show saved score after match ends`);
+          audienceDisplayOptions.savedScore = false;
+        };
+      };
+
     };
   });
 })();

@@ -3,9 +3,9 @@ import ObsWebSocket from "obs-websocket-js";
 import Client from "vex-tm-client";
 import Fieldset, { AudienceDisplayMode, AudienceDisplayOptions } from "vex-tm-client/out/Fieldset";
 import { getCredentials, connectTM, connectOBS } from "./authenticate";
-import getPath from "platform-folders";
 import { join } from "path";
 import { promises as fs } from "fs";
+import { tmpdir } from "os";
 
 async function getFieldset(tm: Client) {
   const response: { fieldset: string } = await inquirer.prompt([
@@ -80,8 +80,8 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
   ]);
 
   if (response.record) {
-    const directory = getPath("desktop") ?? getPath("documents") ?? getPath("home") as string;
-    const path = join(directory, `obs_switcher_${new Date().toISOString()}_times.csv`);
+    const directory = tmpdir();
+    const path = join(directory, `tm_obs_switcher_${new Date().toISOString()}_times.csv`);
 
     console.log(`  Will save match stream times to ${path}`);
     const handle = await fs.open(path, "w");
@@ -95,6 +95,9 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
 };
 
 (async function () {
+
+  console.log(`tm-obs-switcher v${require("./package.json").version}`);
+  console.log("Created by Brendan McGuire (brendan@bren.app)\n");
 
   // Prompt the user for credentials
   const creds = await getCredentials();

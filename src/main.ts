@@ -96,7 +96,7 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
 
 (async function () {
 
-  console.log(`tm-obs-switcher v${require("./package.json").version}`);
+  console.log(`tm-obs-switcher v${require("../package.json").version}`);
   console.log("Created by Brendan McGuire (brendan@bren.app)\n");
 
   // Prompt the user for credentials
@@ -114,9 +114,12 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
   const fieldset = await getFieldset(tm);
   const fields = new Map(fieldset.fields.map((f) => [f.id, f]));
   const associations = await getAssociations(fieldset, obs);
+
+  console.log("");
+
   const audienceDisplayOptions = await getAudienceDisplayOptions();
   const timestampFile = await getRecordingPath(tm);
-  console.log("Done!\n");
+  console.log("");
 
   let queued = "";
   let started = false;

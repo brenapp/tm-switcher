@@ -68,7 +68,7 @@ export async function connectTM({
 
   try {
     await client.connect();
-  } catch (e) {
+  } catch (e: any) {
     console.log(e.message);
     process.exit(1);
   }
@@ -82,5 +82,8 @@ export async function connectOBS(creds: { address: string; password: string }) {
 
   return new Promise<OBSWebSocket>((resolve, reject) => {
     obs.on("ConnectionOpened", () => resolve(obs));
+    obs.on("AuthenticationFailure", () => reject("Authentication failed"));
+    obs.on("ConnectionClosed", () => reject("Connection closed"));
+    obs.on("Exiting", () => reject("Connection closed"));
   });
 }

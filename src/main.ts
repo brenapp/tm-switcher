@@ -16,12 +16,16 @@ import { getOBSAssociations, getATEMAssociations, getAudienceDisplayOptions, get
   console.log("✅ Tournament Manager");
 
   const obs = await connectOBS(creds.obs);
-  console.log("✅ Open Broadcaster Studio\n");
+  if (obs) {
+    console.log("✅ Open Broadcaster Studio");
+  }
 
   const atem = await connectATEM(creds.atem);
   if (atem) {
     console.log("✅ ATEM");
   };
+
+  console.log("");
 
   // Configuration
   const division = await getDivision(tm);
@@ -50,7 +54,7 @@ import { getOBSAssociations, getATEMAssociations, getAudienceDisplayOptions, get
       timecode = (status["rec-timecode"] ?? "00:00:00").split(".")[0];
     } else if (status?.streaming) {
       timecode = (status["stream-timecode"] ?? "00:00:00").split(".")[0];
-    }
+    };
 
     if (message.type === "fieldMatchAssigned") {
       const id = message.fieldId;

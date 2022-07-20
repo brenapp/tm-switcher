@@ -1,6 +1,7 @@
 import inquirer from "inquirer";
 import Client, { AuthenticatedRole } from "vex-tm-client";
 import OBSWebSocket from "obs-websocket-js";
+import ATEM from "applest-atem";
 
 export async function getTournamentManagerCredentials(): Promise<{
   address: string;
@@ -27,7 +28,18 @@ export async function getTournamentManagerCredentials(): Promise<{
 export async function getOBSCredentials(): Promise<{
   address: string;
   password: string;
-}> {
+} | null> {
+
+  const { enable } = await inquirer.prompt({
+    type: "confirm",
+    name: "enable",
+    message: "Control OBS?",
+  });
+
+  if (!enable) {
+    return null;
+  };
+
   return inquirer.prompt([
     {
       type: "input",
@@ -46,11 +58,33 @@ export async function getOBSCredentials(): Promise<{
   ]);
 }
 
+export async function getATEMCredentials(): Promise<{ address: string } | null> {
+
+  const { enable } = await inquirer.prompt({
+    type: "confirm",
+    name: "enable",
+    message: "Control an ATEM?",
+  });
+
+  if (!enable) {
+    return null;
+  };
+
+  return inquirer.prompt([
+    {
+      type: "input",
+      message: "ATEM Network Address:",
+      name: "address",
+    }
+  ])
+};
+
 export async function getCredentials() {
   const tm = await getTournamentManagerCredentials();
   const obs = await getOBSCredentials();
+  const atem = await getATEMCredentials();
 
-  return { tm, obs };
+  return { tm, obs, atem };
 }
 
 async function keypress() {
@@ -92,9 +126,14 @@ export async function connectTM({
   return client;
 }
 
-export async function connectOBS(creds: { address: string; password: string }) {
+export async function connectOBS(creds: { address: string; password: string } | null) {
+
+  if (!creds) {
+    return null;
+  };
+
   const obs = new OBSWebSocket();
-  
+
   try {
     await obs.connect(creds);
     return obs;
@@ -105,3 +144,21 @@ export async function connectOBS(creds: { address: string; password: string }) {
     process.exit(1);
   };
 }
+
+export async function connectATEM(credentials: { address: string } | null) {
+  if (!credentials) {
+    return null;
+  }
+
+  const atem = new ATEM();
+
+  try {
+    await atem.connect(credentials.address);
+    return atem;
+  } catch (e: any) {
+    console.log("❌ ATEM: ", e);
+
+    await keypress();
+    process.exit(1);
+  }
+};

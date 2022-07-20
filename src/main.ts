@@ -1,99 +1,6 @@
-import inquirer from "inquirer";
-import ObsWebSocket from "obs-websocket-js";
-import Client from "vex-tm-client";
-import Fieldset, { AudienceDisplayMode, AudienceDisplayOptions } from "vex-tm-client/out/Fieldset";
-import { getCredentials, connectTM, connectOBS } from "./authenticate";
-import { join } from "path";
-import { promises as fs } from "fs";
-import { tmpdir } from "os";
-
-async function getFieldset(tm: Client) {
-  const response: { fieldset: string } = await inquirer.prompt([
-    {
-      name: "fieldset",
-      type: "list",
-      message: "Which fieldset do you wish to control? ",
-      choices: tm.fieldsets.map((d) => d.name),
-    },
-  ]);
-
-  return tm.fieldsets.find(
-    (set) => set.name === response.fieldset
-  ) as Fieldset;
-};
-
-async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
-  const fields = fieldset.fields;
-  const scenes = await obs.send("GetSceneList");
-
-  const associations: string[] = [];
-
-  for (const field of fields) {
-    const response = await inquirer.prompt([
-      {
-        name: "scene",
-        type: "list",
-        message: `What scene do you want to associate with ${field.name}? `,
-        choices: scenes.scenes.map((s) => s.name),
-      },
-    ]);
-    associations[field.id] = response.scene;
-  };
-
-  return associations;
-};
-
-async function getAudienceDisplayOptions() {
-
-  type Choices = "queueIntro" | "preventSwitch" | "savedScore" | "rankings";
-  const choices: { name: string; value: Choices }[] = [
-    { name: "Show intro upon match queue", value: "queueIntro" },
-    { name: "Prevent switching display mode in-match", value: "preventSwitch" },
-    { name: "Show saved score 3 seconds after match", value: "savedScore" },
-    { name: "Flash rankings 3 seconds after every 6th match", value: "rankings" }
-  ];
-
-  const response: { options: Choices[] } = await inquirer.prompt([
-    {
-      name: "options",
-      type: "checkbox",
-      message: "Which audience display automation would you like to enable?",
-      choices
-    }
-  ]);
-
-  const flags = Object.fromEntries(choices.map(ch => [ch.value, false])) as Record<Choices, boolean>;
-  for (const option of response.options) {
-    flags[option] = true;
-  };
-
-  return flags;
-};
-
-async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> {
-
-  const response: { record: boolean } = await inquirer.prompt([
-    {
-      name: "record",
-      type: "confirm",
-      message: "Save a file with stream timestamps for each match?"
-    }
-  ]);
-
-  if (response.record) {
-    const directory = tmpdir();
-    const path = join(directory, `tm_obs_switcher_${new Date().toISOString()}_times.csv`);
-
-    console.log(`  Will save match stream times to ${path}`);
-    const handle = await fs.open(path, "w");
-
-    handle.write("TIMESTAMP,OBS_TIME,MATCH\n");
-
-    return handle
-  } else {
-    return undefined;
-  }
-};
+import { AudienceDisplayMode, AudienceDisplayOptions } from "vex-tm-client/out/Fieldset";
+import { getCredentials, connectTM, connectOBS, connectATEM } from "./authenticate";
+import { getOBSAssociations, getATEMAssociations, getAudienceDisplayOptions, getDivision, getFieldset, getRecordingPath } from "./configuration";
 
 (async function () {
 
@@ -111,15 +18,22 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
   const obs = await connectOBS(creds.obs);
   console.log("✅ Open Broadcaster Studio\n");
 
+  const atem = await connectATEM(creds.atem);
+  if (atem) {
+    console.log("✅ ATEM");
+  };
+
   // Configuration
+  const division = await getDivision(tm);
   const fieldset = await getFieldset(tm);
   const fields = new Map(fieldset.fields.map((f) => [f.id, f]));
-  const associations = await getAssociations(fieldset, obs);
+  const obsAssociations = await getOBSAssociations(fieldset, obs);
+  const atemAssociations = await getATEMAssociations(fieldset, atem);
 
   console.log("");
 
   const audienceDisplayOptions = await getAudienceDisplayOptions();
-  const timestampFile = await getRecordingPath(tm);
+  const timestampFile = await getRecordingPath(obs);
   console.log("");
 
   let queued = "";
@@ -128,13 +42,13 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
 
   fieldset.ws.on("message", async (data) => {
     const message = JSON.parse(data.toString());
-    const status = await obs.send("GetStreamingStatus");
+    const status = await obs?.send("GetStreamingStatus");
 
     // Get the current "stream time" in seconds
     let timecode = "00:00:00";
-    if (status.recording) {
+    if (status?.recording) {
       timecode = (status["rec-timecode"] ?? "00:00:00").split(".")[0];
-    } else if (status.streaming) {
+    } else if (status?.streaming) {
       timecode = (status["stream-timecode"] ?? "00:00:00").split(".")[0];
     }
 
@@ -152,9 +66,16 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
         name = "Unknown";
       };
 
-      console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching to scene ${associations[id]}`);
 
-      await obs.send("SetCurrentScene", { "scene-name": associations[id] });
+      if (obs && obsAssociations) {
+        console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching OBS to scene ${obsAssociations[id]}`);
+        await obs.send("SetCurrentScene", { "scene-name": obsAssociations[id] });
+      }
+
+      if (atem && atemAssociations) {
+        console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching ATEM to channel ${atemAssociations[id]}`);
+        atem.changeProgramInput(atemAssociations[id]);
+      };
 
       if (audienceDisplayOptions.queueIntro) {
         fieldset.setScreen(AudienceDisplayMode.INTRO);
@@ -173,12 +94,23 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
         name = "Unknown";
       };
 
-      console.log(`[${new Date().toISOString()}] [${timecode}] info: match ${started ? "resumed" : "started"} on ${name}, switching to scene ${associations[id]}`);
-      await obs.send("SetCurrentScene", { "scene-name": associations[id] });
+      if (obs && obsAssociations) {
+        console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching OBS to scene ${obsAssociations[id]}`);
+        await obs.send("SetCurrentScene", { "scene-name": obsAssociations[id] });
+      }
+
+      if (atem && atemAssociations) {
+        console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching ATEM to channel ${atemAssociations[id]}`);
+        atem.changeProgramInput(atemAssociations[id]);
+      };
 
       if (!started) {
         started = true;
-        timestampFile?.write(`${new Date().toISOString()},${timecode},${queued}\n`);
+
+        await division.refresh();
+        const match = division.matches.find(match => match.name === queued);
+
+        timestampFile?.write(`${new Date().toISOString()},${timecode},${queued},${match?.redTeams.join(" ")},${match?.blueTeams.join(" ")}\n`);
       }
 
     } else if (message.type === "timeUpdated") {

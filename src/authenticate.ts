@@ -81,7 +81,9 @@ export async function getATEMCredentials(): Promise<{ address: string } | null> 
 
 export async function getCredentials() {
   const tm = await getTournamentManagerCredentials();
+  console.log("");
   const obs = await getOBSCredentials();
+  console.log("");
   const atem = await getATEMCredentials();
 
   return { tm, obs, atem };

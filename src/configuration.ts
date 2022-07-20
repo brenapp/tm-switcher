@@ -4,7 +4,7 @@ import Client from "vex-tm-client";
 import Fieldset from "vex-tm-client/out/Fieldset";
 import { join } from "path";
 import { promises as fs } from "fs";
-import { tmpdir } from "os";
+import { homedir } from "os";
 import Division from "vex-tm-client/out/Division";
 import ATEM from "applest-atem";
 import { keypress } from "./authenticate";
@@ -135,20 +135,34 @@ export async function getRecordingPath(obs: ObsWebSocket | null): Promise<fs.Fil
     ]);
 
     if (response.record) {
-        const directory = tmpdir();
-        const path = join(directory, `tm_obs_switcher_${new Date().toISOString()}_times.csv`);
+        const directory = homedir();
+
+        const { file } = await inquirer.prompt([
+            {
+                name: "file",
+                type: "input",
+                message: "Where do you want to save the file?",
+                default() {
+                    const now = new Date();
+                    return `tm_switcher_${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}.csv`;
+                },
+            }
+        ]);
+
+        const path = join(directory, file);
 
         console.log(`  Will save match stream times to ${path}`);
         let handle: fs.FileHandle;
         try {
-            handle = await fs.open(path, "w");
+            handle = await fs.open(path, "a");
 
             await handle.write("TIMESTAMP,OBS_TIME,MATCH,RED TEAMS, BLUE TEAMS\n");
             return handle
         } catch (e) {
             console.log("❌ Could not write to file: ", e);
+            console.log("Press any key to continue without recording...");
             await keypress();
-            process.exit(1);
+            return null;
         };
 
     } else {

@@ -7,6 +7,7 @@ import { promises as fs } from "fs";
 import { tmpdir } from "os";
 import Division from "vex-tm-client/out/Division";
 import ATEM from "applest-atem";
+import { keypress } from "./authenticate";
 
 export async function getDivision(tm: Client) {
     const response: { division: string } = await inquirer.prompt([
@@ -138,11 +139,18 @@ export async function getRecordingPath(obs: ObsWebSocket | null): Promise<fs.Fil
         const path = join(directory, `tm_obs_switcher_${new Date().toISOString()}_times.csv`);
 
         console.log(`  Will save match stream times to ${path}`);
-        const handle = await fs.open(path, "w");
+        let handle: fs.FileHandle;
+        try {
+            handle = await fs.open(path, "w");
 
-        handle.write("TIMESTAMP,OBS_TIME,MATCH,RED TEAMS, BLUE TEAMS\n");
+            await handle.write("TIMESTAMP,OBS_TIME,MATCH,RED TEAMS, BLUE TEAMS\n");
+            return handle
+        } catch (e) {
+            console.log("❌ Could not write to file: ", e);
+            await keypress();
+            process.exit(1);
+        };
 
-        return handle
     } else {
         return null;
     }

@@ -87,7 +87,7 @@ export async function getCredentials() {
   return { tm, obs, atem };
 }
 
-async function keypress() {
+export async function keypress() {
   return new Promise((resolve, reject) => {
     process.stdin.setRawMode(true);
     process.stdin.resume();

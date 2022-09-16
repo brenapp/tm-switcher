@@ -83,13 +83,19 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
   if (response.record) {
     const directory = cwd();
 
-    const date = new Date().toISOString().replaceAll(/\-|\.|\:/g, "_");
-    const path = join(directory, `tm_obs_switcher_${date}_times.csv`);
+    const date = new Date();
+    const path = join(directory, `tm_obs_switcher_${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}_times.csv`);
 
     console.log(`  Will save match stream times to ${path}`);
     const handle = await fs.open(path, "a");
 
-    handle.write("TIMESTAMP,OBS_TIME,MATCH\n");
+    const stat = await handle.stat();
+    
+   if (stat.size > 0) {
+      console.log(`  File already exists, will append new entries...`);
+   } else {
+      handle.write("TIMESTAMP,OBS_TIME,MATCH\n");
+   }
 
     return handle
   } else {

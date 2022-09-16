@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "bundle": "pkg out/main.js --out-path bundle --targets node16-macos-x64,node16-win-x64,node16-linux-x64",
+    "bundle": "pkg out/main.js --out-path bundle --targets latest-macos-x64,latest-win-x64,latest-linux-x64",
     "run": "node out/main.js",
     "rb": "npm run build && npm run bundle && ./bundle/main-macos"
   },

@@ -1,11 +1,11 @@
 import inquirer from "inquirer";
 import ObsWebSocket from "obs-websocket-js";
 import Client from "vex-tm-client";
-import Fieldset, { AudienceDisplayMode, AudienceDisplayOptions } from "vex-tm-client/out/Fieldset";
 import { getCredentials, connectTM, connectOBS } from "./authenticate";
 import { join } from "path";
 import { promises as fs } from "fs";
 import { tmpdir } from "os";
+import Fieldset, { AudienceDisplayMode, AudienceDisplayOptions } from "vex-tm-client/out/Fieldset";
 
 async function getFieldset(tm: Client) {
   const response: { fieldset: string } = await inquirer.prompt([
@@ -24,7 +24,7 @@ async function getFieldset(tm: Client) {
 
 async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
   const fields = fieldset.fields;
-  const scenes = await obs.send("GetSceneList");
+  const scenes = await obs.call("GetSceneList");
 
   const associations: string[] = [];
 
@@ -34,7 +34,7 @@ async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
         name: "scene",
         type: "list",
         message: `What scene do you want to associate with ${field.name}? `,
-        choices: scenes.scenes.map((s) => s.name),
+        choices: scenes.scenes.map((s) => s.sceneName),
       },
     ]);
     associations[field.id] = response.scene;
@@ -128,15 +128,17 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
 
   fieldset.ws.on("message", async (data) => {
     const message = JSON.parse(data.toString());
-    const status = await obs.send("GetStreamingStatus");
+    const recordStatus = await obs.call("GetRecordStatus");
+    const streamStatus = await obs.call("GetStreamStatus");
 
     // Get the current "stream time" in seconds
     let timecode = "00:00:00";
-    if (status.recording) {
-      timecode = (status["rec-timecode"] ?? "00:00:00").split(".")[0];
-    } else if (status.streaming) {
-      timecode = (status["stream-timecode"] ?? "00:00:00").split(".")[0];
-    }
+
+    if (recordStatus.outputActive) {
+      timecode = recordStatus.outputTimecode;
+    } else if (streamStatus.outputActive) {
+      timecode = streamStatus.outputTimecode;
+    };
 
     if (message.type === "fieldMatchAssigned") {
       const id = message.fieldId;
@@ -154,7 +156,7 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
 
       console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching to scene ${associations[id]}`);
 
-      await obs.send("SetCurrentScene", { "scene-name": associations[id] });
+      await obs.call("SetCurrentProgramScene", { sceneName: associations[id] });
 
       if (audienceDisplayOptions.queueIntro) {
         fieldset.setScreen(AudienceDisplayMode.INTRO);
@@ -174,7 +176,7 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
       };
 
       console.log(`[${new Date().toISOString()}] [${timecode}] info: match ${started ? "resumed" : "started"} on ${name}, switching to scene ${associations[id]}`);
-      await obs.send("SetCurrentScene", { "scene-name": associations[id] });
+      await obs.call("SetCurrentProgramScene", { sceneName: associations[id] });
 
       if (!started) {
         started = true;

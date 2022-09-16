@@ -34,7 +34,7 @@ export async function getOBSCredentials(): Promise<{
       message: "OBS Websocket Address:",
       name: "address",
       default() {
-        return "127.0.0.1:4444";
+        return "ws://127.0.0.1:4455";
       },
     },
     {
@@ -94,9 +94,9 @@ export async function connectTM({
 
 export async function connectOBS(creds: { address: string; password: string }) {
   const obs = new OBSWebSocket();
-  
+
   try {
-    await obs.connect(creds);
+    await obs.connect(creds.address, creds.password);
     return obs;
   } catch (e: any) {
     console.log("❌ Open Broadcaster Studio: ", e);

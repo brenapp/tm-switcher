@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "bundle": "pkg out/main.js --out-path bundle --targets latest-macos-x64,latest-win-x64,latest-linux-x64",
+    "bundle": "pkg out/main.js --out-path bundle --targets latest-macos-x64,latest-win-x64,latest-linux-x64 && mv bundle/main-linux bundle/tm-obs-switcher-linux && mv bundle/main-macos bundle/tm-obs-switcher-macos && mv bundle/main-win.exe bundle/tm-obs-switcher-win.exe",
     "run": "node out/main.js",
     "rb": "npm run build && npm run bundle && ./bundle/main-macos"
   },

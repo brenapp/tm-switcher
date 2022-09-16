@@ -4,7 +4,7 @@ import Client from "vex-tm-client";
 import { getCredentials, connectTM, connectOBS } from "./authenticate";
 import { join } from "path";
 import { promises as fs } from "fs";
-import { tmpdir } from "os";
+import { cwd } from "process";
 import Fieldset, { AudienceDisplayMode, AudienceDisplayOptions } from "vex-tm-client/out/Fieldset";
 
 async function getFieldset(tm: Client) {
@@ -81,11 +81,13 @@ async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> 
   ]);
 
   if (response.record) {
-    const directory = tmpdir();
-    const path = join(directory, `tm_obs_switcher_${new Date().toISOString()}_times.csv`);
+    const directory = cwd();
+
+    const date = new Date().toISOString().replaceAll(/\-|\.|\:/g, "_");
+    const path = join(directory, `tm_obs_switcher_${date}_times.csv`);
 
     console.log(`  Will save match stream times to ${path}`);
-    const handle = await fs.open(path, "w");
+    const handle = await fs.open(path, "a");
 
     handle.write("TIMESTAMP,OBS_TIME,MATCH\n");
 

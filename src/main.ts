@@ -47,7 +47,11 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPa
       timecode = streamStatus.outputTimecode;
     };
 
-    if (message.type === "fieldMatchAssigned") {
+
+    /**
+     * When a match is queued, switch to its associated scene
+     */
+    async function fieldMatchAssigned() {
       const id = message.fieldId;
 
       // Elims won't have an assigned field, they can switch early, but we'll
@@ -72,9 +76,13 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPa
       // keep track of the queued match
       queued = message.name;
       started = false;
+    };
 
-      // Force the scene to switch when the match starts
-    } else if (message.type === "matchStarted") {
+    /**
+     * When the match starts, switch the scene to the appropriate field, and log to the timestamp
+     * file and console 
+     **/
+    async function matchStarted() {
       const id = message.fieldId;
 
       let name = fields.get(id)?.name;
@@ -89,16 +97,22 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPa
         started = true;
         timestampFile?.write(`${new Date().toISOString()},${timecode},${queued}\n`);
       }
+    }
 
-    } else if (message.type === "timeUpdated") {
-
+    /**
+     * Every second during the match, prevent switching
+     **/
+    async function timeUpdated() {
       // Force the audience display to be in-match during the entire match
       if (audienceDisplayOptions.preventSwitch) {
         fieldset.setScreen(AudienceDisplayMode.IN_MATCH);
       };
+    }
 
-    } else if (message.type === "matchStopped") {
-
+    /**
+     * When the match ends, switch to the end graphic (if appropriate)
+     **/
+    async function matchStopped() {
       matchCount++;
 
       // Show saved score 3 seconds after the match ends
@@ -113,8 +127,12 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPa
           fieldset.setScreen(AudienceDisplayMode.SAVED_MATCH_RESULTS);
         }, 3000);
       };
+    };
 
-    } else if (message.type === "displayUpdated") {
+    /**
+     * Disable showing saved score/rankings when the display switches to elim bracket or alliance selection
+     **/
+    async function displayUpdated() {
       const mode = message.display as AudienceDisplayMode;
       const option = message.displayOption as AudienceDisplayOptions;
 
@@ -128,5 +146,30 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPa
       };
 
     };
+
+
+    // Dispatch each event appropriately
+    switch (message.type) {
+      case "fieldMatchAssigned": {
+        await fieldMatchAssigned();
+        break;
+      }
+      case "matchStarted": {
+        await matchStarted();
+        break;
+      }
+      case "timeUpdated": {
+        await timeUpdated();
+        break;
+      }
+      case "matchStopped": {
+        await matchStopped();
+        break;
+      }
+      case "displayUpdated": {
+        await displayUpdated();
+        break;
+      }
+    }
   });
 })();

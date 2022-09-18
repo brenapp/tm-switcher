@@ -1,6 +1,6 @@
 import { getCredentials, connectTM, connectOBS } from "./authenticate";
 import { AudienceDisplayMode, AudienceDisplayOptions } from "vex-tm-client/out/Fieldset";
-import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPath } from "./input";
+import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingOptions } from "./input";
 
 (async function () {
 
@@ -26,7 +26,8 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPa
   console.log("");
 
   const audienceDisplayOptions = await getAudienceDisplayOptions();
-  const timestampFile = await getRecordingPath(tm);
+  const { handle: timestampFile, recordIndividualMatches, division } = await getRecordingOptions(tm);
+
   console.log("");
 
   let queued = "";
@@ -41,16 +42,15 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPa
     // Get the current "stream time" in seconds
     let timecode = "00:00:00";
 
-    if (recordStatus.outputActive) {
+    if (recordStatus.outputActive && !recordIndividualMatches) {
       timecode = recordStatus.outputTimecode;
     } else if (streamStatus.outputActive) {
       timecode = streamStatus.outputTimecode;
     };
 
-
     /**
      * When a match is queued, switch to its associated scene
-     */
+     **/
     async function fieldMatchAssigned() {
       const id = message.fieldId;
 
@@ -95,7 +95,17 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPa
 
       if (!started) {
         started = true;
-        timestampFile?.write(`${new Date().toISOString()},${timecode},${queued}\n`);
+
+        // Get information about the match
+        await division.refresh();
+        const match = division.matches.find((m) => m.name === message.name);
+
+        if (recordIndividualMatches) {
+          await obs.call("StartRecord");
+        }
+
+        await timestampFile?.write(`${new Date().toISOString()},${timecode},${queued},${match?.redTeams.join(" ")},${match?.blueTeams.join(" ")}\n`);
+
       }
     }
 
@@ -127,6 +137,10 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPa
           fieldset.setScreen(AudienceDisplayMode.SAVED_MATCH_RESULTS);
         }, 3000);
       };
+
+      if (recordIndividualMatches) {
+        await obs.call("StopRecord");
+      };
     };
 
     /**
@@ -146,7 +160,6 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingPa
       };
 
     };
-
 
     // Dispatch each event appropriately
     switch (message.type) {

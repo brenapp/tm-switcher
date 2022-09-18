@@ -5,6 +5,7 @@ import { join } from "path";
 import { promises as fs } from "fs";
 import { cwd } from "process";
 import Fieldset from "vex-tm-client/out/Fieldset";
+import Division from "vex-tm-client/out/Division";
 
 export async function getFieldset(tm: Client) {
     const response: { fieldset: string } = await inquirer.prompt([
@@ -69,35 +70,45 @@ export async function getAudienceDisplayOptions() {
     return flags;
 };
 
-export async function getRecordingPath(tm: Client): Promise<fs.FileHandle | undefined> {
+export async function getRecordingOptions(tm: Client) {
 
-    const response: { record: boolean } = await inquirer.prompt([
+    const response: { recordIndividualMatches: boolean } = await inquirer.prompt([
         {
-            name: "record",
+            name: "recordIndividualMatches",
             type: "confirm",
-            message: "Save a file with stream timestamps for each match?"
+            message: "Start and stop recording for each match? "
         }
     ]);
 
-    if (response.record) {
-        const directory = cwd();
+    let division: Division = tm.divisions[0];
+    if (tm.divisions.length > 1) {
+        const response: { division: number } = await inquirer.prompt([
+            {
+                name: "division",
+                type: "list",
+                message: "Which division do you wish to record? ",
+                choices: tm.divisions.map(d => ({ name: d.name, value: d.id }))
+            },
+        ]);
 
-        const date = new Date();
-        const path = join(directory, `tm_obs_switcher_${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}_times.csv`);
+        division = tm.divisions.find(d => d.id === response.division) as Division;
+    };
 
-        console.log(`  Will save match stream times to ${path}`);
-        const handle = await fs.open(path, "a");
+    const directory = cwd();
 
-        const stat = await handle.stat();
+    const date = new Date();
+    const path = join(directory, `tm_obs_switcher_${date.getDate()}_${date.getMonth() + 1}_${date.getFullYear()}_times.csv`);
 
-        if (stat.size > 0) {
-            console.log(`  File already exists, will append new entries...`);
-        } else {
-            handle.write("TIMESTAMP,OBS_TIME,MATCH\n");
-        }
+    console.log(`  Will save match stream times to ${path}`);
+    const handle = await fs.open(path, "a");
 
-        return handle
+    const stat = await handle.stat();
+
+    if (stat.size > 0) {
+        console.log(`  File already exists, will append new entries...`);
     } else {
-        return undefined;
+        handle.write("TIMESTAMP,OBS_TIME,MATCH\n");
     }
+
+    return { handle, division, ...response }
 };

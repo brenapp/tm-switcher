@@ -1,4 +1,4 @@
-import { getCredentials, connectTM, connectOBS } from "./authenticate";
+import { getCredentials, connectTM, connectOBS, connectATEM } from "./authenticate";
 import { AudienceDisplayMode, AudienceDisplayOptions } from "vex-tm-client/out/Fieldset";
 import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingOptions } from "./input";
 
@@ -16,12 +16,19 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingOp
   console.log("✅ Tournament Manager");
 
   const obs = await connectOBS(creds.obs);
-  console.log("✅ Open Broadcaster Studio\n");
+  console.log("✅ Open Broadcaster Studio");
+
+  const atem = await connectATEM(creds.atem.address);
+  if (atem) {
+    console.log("✅ ATEM");
+  }
+
+  console.log("");
 
   // Configuration
   const fieldset = await getFieldset(tm);
   const fields = new Map(fieldset.fields.map((f) => [f.id, f]));
-  const associations = await getAssociations(fieldset, obs);
+  const associations = await getAssociations(fieldset, obs, atem);
 
   console.log("");
 
@@ -65,9 +72,14 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingOp
         name = "Unknown";
       };
 
-      console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching to scene ${associations[id]}`);
+      const association = associations[id];
+      console.log(`[${new Date().toISOString()}] [${timecode}] info: ${message.name} queued on ${name}, switching to scene ${association.obs}${association.atem ? ` and ATEM ${association.atem}` : ""}`);
 
-      await obs.call("SetCurrentProgramScene", { sceneName: associations[id] });
+      await obs.call("SetCurrentProgramScene", { sceneName: association.obs });
+
+      if (atem && association.atem) {
+        atem.changeProgramInput(association.atem);
+      };
 
       if (audienceDisplayOptions.queueIntro) {
         fieldset.setScreen(AudienceDisplayMode.INTRO);
@@ -90,8 +102,14 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingOp
         name = "Unknown";
       };
 
-      console.log(`[${new Date().toISOString()}] [${timecode}] info: match ${started ? "resumed" : "started"} on ${name}, switching to scene ${associations[id]}`);
-      await obs.call("SetCurrentProgramScene", { sceneName: associations[id] });
+      const association = associations[id];
+      console.log(`[${new Date().toISOString()}] [${timecode}] info: match ${started ? "resumed" : "started"} on ${name}, switching to scene ${association.obs}${association.atem ? ` and ATEM ${association.atem}` : ""}`);
+
+      await obs.call("SetCurrentProgramScene", { sceneName: association.obs });
+
+      if (atem && association.atem) {
+        atem.changeProgramInput(association.atem);
+      };
 
       if (!started) {
         started = true;
@@ -186,3 +204,7 @@ import { getAssociations, getAudienceDisplayOptions, getFieldset, getRecordingOp
     }
   });
 })();
+
+process.on("exit", () => {
+  console.log("exiting...");
+});

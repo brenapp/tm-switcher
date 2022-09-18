@@ -6,6 +6,7 @@ import { promises as fs } from "fs";
 import { cwd } from "process";
 import Fieldset from "vex-tm-client/out/Fieldset";
 import Division from "vex-tm-client/out/Division";
+import { Atem } from "atem-connection";
 
 export async function getFieldset(tm: Client) {
     const response: { fieldset: string } = await inquirer.prompt([
@@ -22,22 +23,38 @@ export async function getFieldset(tm: Client) {
     ) as Fieldset;
 };
 
-export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket) {
+export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket, atem: Atem | null) {
     const fields = fieldset.fields;
     const scenes = await obs.call("GetSceneList");
 
-    const associations: string[] = [];
+    const associations: { obs: string, atem: number | undefined }[] = [];
 
     for (const field of fields) {
-        const response = await inquirer.prompt([
+
+        const questions = [
             {
-                name: "scene",
+                name: "obs",
                 type: "list",
-                message: `What scene do you want to associate with ${field.name}? `,
+                message: `What OBS scene do you want to associate with ${field.name}? `,
                 choices: scenes.scenes.map((s) => s.sceneName),
             },
-        ]);
-        associations[field.id] = response.scene;
+        ];
+
+        if (atem && atem.state) {
+
+            const inputs = Object.entries(atem.state?.inputs);
+            questions.push(
+                {
+                    name: "atem",
+                    type: "list",
+                    message: `What ATEM input do you want to associate with ${field.name}? `,
+                    choices: inputs.map(([value, input]) => ({ name: input?.shortName, value: Number.parseInt(value) }))
+                }
+            );
+        }
+
+        const response: { obs: string, atem: number | undefined } = await inquirer.prompt(questions);
+        associations[field.id] = response;
     };
 
     return associations;
@@ -76,7 +93,8 @@ export async function getRecordingOptions(tm: Client) {
         {
             name: "recordIndividualMatches",
             type: "confirm",
-            message: "Start and stop recording for each match? "
+            message: "Start and stop recording for each match? ",
+            default: false
         }
     ]);
 

@@ -1,6 +1,7 @@
 import inquirer from "inquirer";
 import Client, { AuthenticatedRole } from "vex-tm-client";
 import OBSWebSocket from "obs-websocket-js";
+import { Atem } from "atem-connection";
 
 export async function getTournamentManagerCredentials(): Promise<{
   address: string;
@@ -46,11 +47,36 @@ export async function getOBSCredentials(): Promise<{
   ]);
 }
 
+export async function getATEMCredentials(): Promise<{ address: string | null }> {
+
+  const { useAtem }: { useAtem: boolean } = await inquirer.prompt([{
+    type: "confirm",
+    name: "useAtem",
+    message: "Would you like to control an ATEM device over the network?",
+    default: false
+  }]);
+
+  if (useAtem) {
+
+    const { address }: { address: string } = await inquirer.prompt([{
+      type: "input",
+      message: "ATEM Address:",
+      name: "address"
+    }]);
+
+    return { address };
+  } else {
+    return { address: null };
+  }
+
+};
+
 export async function getCredentials() {
   const tm = await getTournamentManagerCredentials();
   const obs = await getOBSCredentials();
+  const atem = await getATEMCredentials();
 
-  return { tm, obs };
+  return { tm, obs, atem };
 }
 
 async function keypress() {
@@ -105,3 +131,37 @@ export async function connectOBS(creds: { address: string; password: string }) {
     process.exit(1);
   };
 }
+
+export async function connectATEM(address: string | null): Promise<Atem | null> {
+
+  if (!address) {
+    return null;
+  };
+
+  return new Promise((resolve) => {
+    const atem = new Atem();
+
+    // In order to suppress a message, add nothing listeners
+    process.on("exit", () => { });
+    process.on("uncaughtException", () => { });
+    process.on("unhandledRejection", () => { });
+
+    atem.connect(address);
+
+    const timeout = setTimeout(async () => {
+      console.log("❌ ATEM: Could not connect to switcher");
+      atem.disconnect();
+
+      await keypress();
+      process.exit(1);
+    }, 15000);
+
+    atem.on("connected", () => {
+      clearTimeout(timeout);
+      atem.on("info", message => console.log(`[${new Date().toISOString()}] [atem] info: ${message}`));
+      atem.on("error", message => console.log(`[${new Date().toISOString()}] [atem] error: ${message}`));
+
+      resolve(atem)
+    });
+  });
+};

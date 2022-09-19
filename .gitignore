@@ -1,3 +1,4 @@
 node_modules
 bundle
 out
+.DS_Store

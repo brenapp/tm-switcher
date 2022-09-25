@@ -7,6 +7,7 @@ import { cwd } from "process";
 import Fieldset from "vex-tm-client/out/Fieldset";
 import Division from "vex-tm-client/out/Division";
 import { Atem } from "atem-connection";
+import OBSWebSocket from "obs-websocket-js";
 
 export async function getFieldset(tm: Client) {
     const response: { fieldset: string } = await inquirer.prompt([
@@ -23,22 +24,28 @@ export async function getFieldset(tm: Client) {
     ) as Fieldset;
 };
 
-export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket, atem: Atem | null) {
+export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket | null, atem: Atem | null) {
     const fields = fieldset.fields;
-    const scenes = await obs.call("GetSceneList");
 
-    const associations: { obs: string, atem: number | undefined }[] = [];
+    const scenes = await obs?.call("GetSceneList") ?? { scenes: [] };
+
+
+    const associations: { obs: string | undefined, atem: number | undefined }[] = [];
 
     for (const field of fields) {
 
-        const questions = [
-            {
-                name: "obs",
-                type: "list",
-                message: `What OBS scene do you want to associate with ${field.name}? `,
-                choices: scenes.scenes.map((s) => s.sceneName),
-            },
-        ];
+        const questions = [];
+
+        if (obs && scenes.scenes.length > 0) {
+            questions.push(
+                {
+                    name: "obs",
+                    type: "list",
+                    message: `What OBS scene do you want to associate with ${field.name}? `,
+                    choices: scenes.scenes.map((s) => s.sceneName),
+                },
+            );
+        }
 
         if (atem && atem.state) {
 
@@ -53,7 +60,7 @@ export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket, ate
             );
         }
 
-        const response: { obs: string, atem: number | undefined } = await inquirer.prompt(questions);
+        const response: { obs: string | undefined, atem: number | undefined } = await inquirer.prompt(questions);
         associations[field.id] = response;
     };
 
@@ -87,16 +94,19 @@ export async function getAudienceDisplayOptions() {
     return flags;
 };
 
-export async function getRecordingOptions(tm: Client) {
+export async function getRecordingOptions(tm: Client, obs: OBSWebSocket | null) {
 
-    const response: { recordIndividualMatches: boolean } = await inquirer.prompt([
-        {
-            name: "recordIndividualMatches",
-            type: "confirm",
-            message: "Start and stop recording for each match? ",
-            default: false
-        }
-    ]);
+    let response = { recordIndividualMatches: false };
+    if (obs) {
+        response = await inquirer.prompt([
+            {
+                name: "recordIndividualMatches",
+                type: "confirm",
+                message: "Start and stop recording for each match? ",
+                default: false
+            }
+        ]);
+    }
 
     let division: Division = tm.divisions[0];
     if (tm.divisions.length > 1) {
@@ -125,7 +135,7 @@ export async function getRecordingOptions(tm: Client) {
     if (stat.size > 0) {
         console.log(`  File already exists, will append new entries...`);
     } else {
-        handle.write("TIMESTAMP,OBS_TIME,MATCH\n");
+        handle.write("TIMESTAMP,OBS_TIME,MATCH,RED_TEAMS,BLUE_TEAMS\n");
     }
 
     return { handle, division, ...response }

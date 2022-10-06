@@ -42,4 +42,4 @@ Some key implementation details to be aware of when deploying this at your event
 - Due to a quirk in the `atem-connection` module, ATEM control over USB is not supported. You will need to ensure that your switcher is connected to the network. Be advised that most ATEM switchers assign themselves static IPs (usually 192.168.10.240), so make sure that your router is able to assign that IP. Use the ATEM Setup utility over USB to connect 
 
 
-If your event runs into trouble with this product, please reach out to me! I have seen this tool deployed at many different events with great success!
+If your event runs into trouble with this tool, please reach out to me!.

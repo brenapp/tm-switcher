@@ -1,7 +1,7 @@
-# Tournament Manager OBS Switcher
+![TM Switcher](https://user-images.githubusercontent.com/8839926/194345784-558c3ab7-8e0b-4d5d-a789-0ef14376bb56.png)
 
-This is small tool to automatically switch scenes in OBS when VEX Tournament
-Manager queues up a new match on a fieldset.
+
+Tournament Manager Switcher will automatically managing livestream switching for you when running tournaments in VEX Tournament Manager
 
 ![image](https://user-images.githubusercontent.com/8839926/153454145-18752edc-5022-4fa5-a0eb-538dfd4a5a1e.png)
 
@@ -42,3 +42,7 @@ npm run-script build
 ```
 npm run-script run
 ```
+
+## Configuration
+
+## Troubleshooting

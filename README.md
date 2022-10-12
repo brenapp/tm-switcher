@@ -1,7 +1,21 @@
 ![TM Switcher](https://user-images.githubusercontent.com/8839926/194345784-558c3ab7-8e0b-4d5d-a789-0ef14376bb56.png)
 
 
-Tournament Manager Switcher will automatically managing livestream switching for you when running tournaments in VEX Tournament Manager
+TM Switcher will automatically manage robotics competition livestreams that use VEX Tournament Manager. Typically, most events require a dedicated volunteer to handle switching cameras between fields and controlling the audience displays.
+
+This application provides a level of automation to vastly simplify the workload involved in running a livestream for your event. See below for a list of features!
+
+- Integrate with OBS to automatically change scenes when matches are queued or started
+
+- Capable of controlling an ATEM switcher over the network when matches are queued or started
+
+- Automatically switch audience display to show match results when a match ends
+
+- Automatically show rankings intermitently throughout the event
+
+- Record timestamps for when each match starts and its timestamp in the livestream
+
+- Create records for every match
 
 ![image](https://user-images.githubusercontent.com/8839926/153454145-18752edc-5022-4fa5-a0eb-538dfd4a5a1e.png)
 

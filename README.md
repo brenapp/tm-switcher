@@ -15,7 +15,7 @@ This application provides a level of automation to vastly simplify the workload 
 
 - Record timestamps for when each match starts and its timestamp in the livestream
 
-- Create records for every match
+- Create recordings for every match
 
 ![image](https://user-images.githubusercontent.com/8839926/153454145-18752edc-5022-4fa5-a0eb-538dfd4a5a1e.png)
 

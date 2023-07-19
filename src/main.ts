@@ -178,8 +178,6 @@ import { getAssociations, getFieldset, getRecordingOptions } from "./input";
 
   fieldset.on("MATCH_ABORTED", async message => {
     if (obs && recordIndividualMatches) {
-      const status = await obs.call("GetRecordStatus");
-      console.log(status);
       await stopRecording();
     }
   });

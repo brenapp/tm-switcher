@@ -14,7 +14,7 @@ export async function getFieldset(tm: Client) {
         {
             name: "fieldset",
             type: "list",
-            message: "Which fieldset do you wish to control? ",
+            message: "Attach to which fieldset? ",
             choices: tm.fieldsets.map((d) => d.name),
         },
     ]);
@@ -28,11 +28,9 @@ export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket | nu
     const fields = fieldset.fields;
 
     const scenes = await obs?.call("GetSceneList") ?? { scenes: [] };
+    const associations: Record<string, { obs: string | undefined, atem: number | undefined }> = {};
 
-
-    const associations: { obs: string | undefined, atem: number | undefined }[] = [];
-
-    for (const field of fields) {
+    for (const [id, name] of Object.entries(fields)) {
 
         const questions = [];
 
@@ -41,7 +39,7 @@ export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket | nu
                 {
                     name: "obs",
                     type: "list",
-                    message: `What OBS scene do you want to associate with ${field.name}? `,
+                    message: `What OBS scene do you want to associate with ${name}? `,
                     choices: scenes.scenes.map((s) => s.sceneName),
                 },
             );
@@ -54,44 +52,17 @@ export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket | nu
                 {
                     name: "atem",
                     type: "list",
-                    message: `What ATEM input do you want to associate with ${field.name}? `,
+                    message: `What ATEM input do you want to associate with ${name}? `,
                     choices: inputs.map(([value, input]) => ({ name: input?.shortName, value: Number.parseInt(value) }))
                 }
             );
         }
 
         const response: { obs: string | undefined, atem: number | undefined } = await inquirer.prompt(questions);
-        associations[field.id] = response;
+        associations[id] = response;
     };
 
     return associations;
-};
-
-export async function getAudienceDisplayOptions() {
-
-    type Choices = "queueIntro" | "preventSwitch" | "savedScore" | "rankings";
-    const choices: { name: string; value: Choices }[] = [
-        { name: "Show intro upon match queue", value: "queueIntro" },
-        { name: "Prevent switching display mode in-match", value: "preventSwitch" },
-        { name: "Show saved score 3 seconds after match", value: "savedScore" },
-        { name: "Flash rankings 3 seconds after every 6th match", value: "rankings" }
-    ];
-
-    const response: { options: Choices[] } = await inquirer.prompt([
-        {
-            name: "options",
-            type: "checkbox",
-            message: "Which audience display automation would you like to enable?",
-            choices
-        }
-    ]);
-
-    const flags = Object.fromEntries(choices.map(ch => [ch.value, false])) as Record<Choices, boolean>;
-    for (const option of response.options) {
-        flags[option] = true;
-    };
-
-    return flags;
 };
 
 export async function getRecordingOptions(tm: Client, obs: OBSWebSocket | null) {
@@ -114,8 +85,9 @@ export async function getRecordingOptions(tm: Client, obs: OBSWebSocket | null) 
             {
                 name: "division",
                 type: "list",
-                message: "Which division do you wish to record? ",
-                choices: tm.divisions.map(d => ({ name: d.name, value: d.id }))
+                message: "Attach to which division? ",
+                choices: tm.divisions.map(d => ({ name: d.name, value: d.id })),
+                default: tm.divisions[0].id
             },
         ]);
 
@@ -135,7 +107,7 @@ export async function getRecordingOptions(tm: Client, obs: OBSWebSocket | null) 
     if (stat.size > 0) {
         console.log(`  File already exists, will append new entries...`);
     } else {
-        handle.write("TIMESTAMP,OBS_TIME,MATCH,RED_TEAMS,BLUE_TEAMS\n");
+        handle.write("TIMESTAMP,OBS_TIME,MATCH\n");
     }
 
     return { handle, division, ...response }

@@ -56,6 +56,29 @@ import { getAssociations, getFieldset, getRecordingOptions } from "./input";
     return timecode;
   };
 
+  async function startRecording() {
+    if (!obs || !recordIndividualMatches) return;
+
+    const { outputActive } = await obs.call("GetRecordStatus");
+    if (outputActive) return;
+
+    const division = currentMatch?.division ? tm.divisions.find(d => d.id === currentMatch?.division) : undefined;
+    const filename = `${defaultFileFormat}_${division?.name ?? ""}_${matchTupleToString(currentMatch).replaceAll(/ /g, "_")}`;
+
+    await obs.call("SetProfileParameter", { parameterCategory: "Output", parameterName: "FilenameFormatting", parameterValue: filename })
+    await obs.call("StartRecord");
+  };
+
+  async function stopRecording() {
+    if (!obs || !recordIndividualMatches) return;
+
+    const { outputActive } = await obs.call("GetRecordStatus");
+    if (!outputActive) return;
+
+    await obs.call("StopRecord");
+    await obs.call("SetProfileParameter", { parameterCategory: "Output", parameterName: "FilenameFormatting", parameterValue: defaultFileFormat })
+  };
+
   function matchTupleToString(match: V3MatchTuple | null) {
     if (!match) return "Match";
 
@@ -91,6 +114,12 @@ import { getAssociations, getFieldset, getRecordingOptions } from "./input";
       }
     };
 
+  };
+
+  let defaultFileFormat = "";
+  if (obs) {
+    const result = await obs.call("GetProfileParameter", { parameterCategory: "Output", parameterName: "FilenameFormatting" })
+    defaultFileFormat = result.parameterValue;
   };
 
   fieldset.on("ASSIGN_FIELD_MATCH", async message => {
@@ -139,7 +168,7 @@ import { getAssociations, getFieldset, getRecordingOptions } from "./input";
 
     // Record the match
     if (obs && recordIndividualMatches) {
-      await obs.call("StartRecord");
+      await startRecording();
     };
 
     // Write the timestamp file
@@ -147,6 +176,19 @@ import { getAssociations, getFieldset, getRecordingOptions } from "./input";
 
   });
 
+  fieldset.on("MATCH_ABORTED", async message => {
+    if (obs && recordIndividualMatches) {
+      const status = await obs.call("GetRecordStatus");
+      console.log(status);
+      await stopRecording();
+    }
+  });
+
+  fieldset.on("MATCH_STOPPED", async message => {
+    if (obs && recordIndividualMatches) {
+      await stopRecording();
+    }
+  });
 })();
 
 process.on("exit", () => {

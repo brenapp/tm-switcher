@@ -1,6 +1,6 @@
 {
   "name": "obs-switcher",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "main": "src/main.ts",
   "bin": "out/main.js",
   "license": "MIT",

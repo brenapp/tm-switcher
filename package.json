@@ -1,12 +1,12 @@
 {
-  "name": "obs-switcher",
+  "name": "tm-switcher",
   "version": "1.6.1",
   "main": "src/main.ts",
   "bin": "out/main.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "bundle": "npm run build && rm -rf bundle && pkg package.json --out-path bundle --targets latest-macos-x64,latest-win-x64,latest-linux-x64 && mv bundle/main-linux bundle/tm-obs-switcher-linux && mv bundle/main-macos bundle/tm-obs-switcher-macos && mv bundle/main-win.exe bundle/tm-obs-switcher-win.exe",
+    "bundle": "npm run build && rm -rf bundle && pkg package.json --out-path bundle --targets latest-macos-x64,latest-win-x64,latest-linux-x64",
     "run": "rm -rf out && tsc && node out/main.js",
     "rb": "npm run build && npm run bundle && ./bundle/main-macos"
   },
@@ -19,7 +19,8 @@
   },
   "pkg": {
     "assets": [
-      "node_modules/@julusian/freetype2/prebuilds/**/*"
+      "node_modules/@julusian/freetype2/prebuilds/**/*",
+      "node_modules/vex-tm-client/out/proto/**"
     ],
     "targets": [
       "latest-macos-x64",

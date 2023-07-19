@@ -187,8 +187,11 @@ import { getAssociations, getFieldset, getRecordingOptions } from "./input";
       await stopRecording();
     }
   });
-})();
 
-process.on("exit", () => {
-  console.log("exiting...");
-});
+  process.on("exit", async () => {
+    console.log("exiting...");
+
+    // Reset to default (for example, if the program stops while a match is running)
+    await obs?.call("SetProfileParameter", { parameterCategory: "Output", parameterName: "FilenameFormatting", parameterValue: defaultFileFormat });
+  });
+})();

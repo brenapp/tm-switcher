@@ -1,12 +1,13 @@
 {
   "name": "obs-switcher",
   "version": "1.5.0",
-  "main": "index.js",
+  "main": "src/main.ts",
+  "bin": "out/main.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "bundle": "pkg out/main.js --out-path bundle --targets latest-macos-x64,latest-win-x64,latest-linux-x64 && mv bundle/main-linux bundle/tm-obs-switcher-linux && mv bundle/main-macos bundle/tm-obs-switcher-macos && mv bundle/main-win.exe bundle/tm-obs-switcher-win.exe",
-    "run": "node out/main.js",
+    "bundle": "npm run build && rm -rf bundle && pkg package.json --out-path bundle --targets latest-macos-x64,latest-win-x64,latest-linux-x64 && mv bundle/main-linux bundle/tm-obs-switcher-linux && mv bundle/main-macos bundle/tm-obs-switcher-macos && mv bundle/main-win.exe bundle/tm-obs-switcher-win.exe",
+    "run": "rm -rf out && tsc && node out/main.js",
     "rb": "npm run build && npm run bundle && ./bundle/main-macos"
   },
   "dependencies": {
@@ -14,10 +15,21 @@
     "atem-connection": "^3.0.1",
     "inquirer": "^7.3.3",
     "obs-websocket-js": "^5.0.1",
-    "vex-tm-client": "^0.3.1"
+    "vex-tm-client": "^0.4.4"
+  },
+  "pkg": {
+    "assets": [
+      "node_modules/@julusian/freetype2/prebuilds/**/*"
+    ],
+    "targets": [
+      "latest-macos-x64",
+      "latest-win-x64",
+      "latest-linux-x64"
+    ],
+    "outputPath": "bundle"
   },
   "devDependencies": {
-    "pkg": "^4.4.9",
+    "pkg": "^5.8.1",
     "typescript": "^4.8.3"
   }
 }

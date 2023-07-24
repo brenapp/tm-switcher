@@ -30,6 +30,12 @@ software installed:
 - [Git](https://git-scm.com) (recommended)
 
 1. Clone or download this repository
+
+```
+git clone git@github.com:MayorMonty/tm-obs-switcher.git
+cd tm-obs-switcher
+```
+
 2. In a terminal window inside the cloned source, run the following commands:
 
 ```
@@ -43,7 +49,6 @@ npm run-script build
 npm run-script run
 ```
 
-
 ## Troubleshooting
 
 Some key implementation details to be aware of when deploying this at your event!
@@ -52,7 +57,7 @@ Some key implementation details to be aware of when deploying this at your event
 
 - ATEM control over USB is not supported due to a quirk in the control protocol. You will need to ensure that your switcher is connected to the network. Most ATEM switchers assign themselves static IPs (usually 192.168.10.240), so make sure that your router is able to assign that IP. Use the ATEM Setup utility over USB to connect 
 
-If your event has trouble with this tool, please contact me!
+If your event has trouble with this tool, please get in touch with me!
 
 ## Disclaimer
 

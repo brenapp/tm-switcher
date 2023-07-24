@@ -1,8 +1,6 @@
 ![TM Switcher](https://user-images.githubusercontent.com/8839926/194345784-558c3ab7-8e0b-4d5d-a789-0ef14376bb56.png)
 
-> Disclaimer: This software is not officially supported by DWAB, VEX Robotics, or the REC Foundation. Event Partners utilizing TM Switcher are doing so at their own risk. 
-
-TM Switcher will automatically manage robotics competition livestreams that use VEX Tournament Manager. Typically, most events require a dedicated volunteer to switch cameras between fields.
+TM Switcher will automatically manage robotics competition livestreams that use VEX Tournament Manager. Typically, most events require a dedicated volunteer to switch cameras between fields. It has been used successfully at dozens of events, including the _Kalahari Classic Signature Event_, _Northeast Wisconsin VEX Showdown Signature Event_, and numerous state championships across multiple seasons.
 
 This application provides automation to simplify the workload of running a livestream for your event. See below for a list of features!
 
@@ -13,6 +11,8 @@ This application provides automation to simplify the workload of running a lives
 - Record timestamps for when each match starts and its timestamp in the livestream
 
 - Create recordings for every match
+
+- Support for events with multiple fieldsets and multiple divisions. This software assumes that *each* field set has its own livestream, so you will need to run an instance of the switcher for every livestream you wish to control.
 
 <img width="1124" alt="image" src="https://github.com/MayorMonty/tm-obs-switcher/assets/8839926/217ed739-fefb-4aa6-b24f-ace06457a8c7">
 
@@ -50,7 +50,10 @@ Some key implementation details to be aware of when deploying this at your event
 
 - Make sure your LAN allows connections between devices! We will deploy our own router attached to the upstream network for our events. This is strongly recommended if you use tablet scoring or multiple computers in your tournament. Additionally, make sure that connections at the following ports are allowed between devices on your network: `80`, `4455`
 
-- Due to a quirk in the `atem-connection` module, ATEM control over USB is not supported. You will need to ensure that your switcher is connected to the network. Most ATEM switchers assign themselves static IPs (usually 192.168.10.240), so make sure that your router is able to assign that IP. Use the ATEM Setup utility over USB to connect 
+- ATEM control over USB is not supported due to a quirk in the control protocol. You will need to ensure that your switcher is connected to the network. Most ATEM switchers assign themselves static IPs (usually 192.168.10.240), so make sure that your router is able to assign that IP. Use the ATEM Setup utility over USB to connect 
 
+If your event has trouble with this tool, please contact me!
 
-If your event runs into trouble with this tool, don't hesitate to contact me!
+## Disclaimer
+
+This software is not officially supported by DWAB, VEX Robotics, or the REC Foundation. Event Partners utilizing TM Switcher are doing so at their own risk. This software is licensed under the MIT License, which permits commercial and non-commercial uses. The author disclaims all liability for running this software at your events.

@@ -1,5 +1,6 @@
 ![TM Switcher](https://user-images.githubusercontent.com/8839926/194345784-558c3ab7-8e0b-4d5d-a789-0ef14376bb56.png)
 
+> Disclaimer: This software is not officially supported by DWAB, VEX Robotics, or the REC Foundation. Event Partners utilizing TM Switcher are doing so at their own risk. 
 
 TM Switcher will automatically manage robotics competition livestreams that use VEX Tournament Manager. Typically, most events require a dedicated volunteer to switch cameras between fields.
 

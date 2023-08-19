@@ -1,5 +1,7 @@
 ![TM Switcher](https://user-images.githubusercontent.com/8839926/194345784-558c3ab7-8e0b-4d5d-a789-0ef14376bb56.png)
 
+> ⚠️ TM Switcher does not currently support VEX Tournament Manager v2023-2024.2 or later
+
 TM Switcher will automatically manage robotics competition livestreams that use VEX Tournament Manager. It has been used successfully at dozens of events, including the [Kalahari Classic Signature Event](https://www.youtube.com/watch?v=Z_GiBfU6cU8), [Northeast Wisconsin VRC Showdown](https://www.youtube.com/watch?v=p9lWt9ZrTQw), and numerous state championships across multiple seasons.
 
 This application provides automation to simplify the workload of running a livestream for your event. See below for a list of features!

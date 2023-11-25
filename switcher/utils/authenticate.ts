@@ -2,8 +2,8 @@ import inquirer from "inquirer";
 import { Client } from "vex-tm-client";
 import OBSWebSocket from "obs-websocket-js";
 import { Atem } from "atem-connection";
-import vextm from "../secret/vextm.json";
-import { log } from "./main";
+import vextm from "../../secret/vextm.json";
+import { log } from "./logging";
 
 export async function getTournamentManagerCredentials(): Promise<{
   address: string;
@@ -86,6 +86,10 @@ export async function getCredentials() {
   const tm = await getTournamentManagerCredentials();
   const obs = await getOBSCredentials();
   const atem = await getATEMCredentials();
+
+  log(`info`, `TM Address: ${tm.address}`, false);
+  log(`info`, `OBS Address: ${obs?.address}`, false);
+  log(`info`, `ATEM Address: ${atem?.address}`, false);
 
   return { tm, obs, atem };
 }
@@ -174,7 +178,7 @@ export async function connectATEM(creds: { address: string } | null): Promise<At
     atem.connect(creds?.address);
 
     const timeout = setTimeout(async () => {
-      log("error", `❌ ATEM: Could not connect to switcher`);
+      log("error", `Could not connect to ATEM device`, `❌ ATEM: Could not connect to switcher`);
       atem.disconnect();
 
       await keypress();

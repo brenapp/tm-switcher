@@ -15,7 +15,7 @@
     "atem-connection": "^3.0.1",
     "inquirer": "^7.3.3",
     "obs-websocket-js": "^5.0.1",
-    "vex-tm-client": "^1.0.3"
+    "vex-tm-client": "^1.1.0"
   },
   "pkg": {
     "assets": [

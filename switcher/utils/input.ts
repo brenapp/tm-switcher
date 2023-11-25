@@ -6,9 +6,9 @@ import { promises as fs } from "fs";
 import { cwd } from "process";
 import { Atem } from "atem-connection";
 import OBSWebSocket from "obs-websocket-js";
-import { keypress } from "./authenticate.js";
+import { keypress } from "./authenticate";
 import { tmpdir, networkInterfaces } from "os";
-import { log } from "./main";
+import { log } from "./logging";
 
 export type TournamentAttachments = {
     fieldset: Fieldset,
@@ -162,7 +162,6 @@ export async function getRecordingOptions(obs: OBSWebSocket | null): Promise<Rec
 
 export type AudienceDisplayOptions = {
     queueIntro: boolean,
-    preventSwitch: boolean,
     savedScore: boolean,
     flashRankings: boolean
 }
@@ -172,7 +171,6 @@ export async function getAudienceDisplayOptions(): Promise<AudienceDisplayOption
 
     const choices = [
         { name: "Show intro upon field activation", value: "queueIntro" },
-        { name: "Prevent switching display mode in-match", value: "preventSwitch" },
         { name: "Show saved score 3 seconds after match", value: "savedScore" },
         { name: "Flash rankings 3 seconds after every 6th match", value: "flashRankings" }
     ] as const;
@@ -219,7 +217,7 @@ export async function getFileHandles(): Promise<FileHandles> {
     const logPath = join(tmpdir(), `tm_switcher_${date}_log.txt`);
     const log = await fs.open(logPath, "a");
 
-    await log.write(`\n\ntm-switcher v${process.env.npm_package_version} started at ${new Date().toISOString()}\n`);
+    await log.write(`\n\ntm-switcher v${require("../../../package.json").version} started at ${new Date().toISOString()}\n`);
     await log.write(`OS:  ${process.platform} ${process.arch}\n`);
     await log.write(`Node Version:  ${process.version}\n`);
     await log.write(`Directory:  ${directory}\n`);

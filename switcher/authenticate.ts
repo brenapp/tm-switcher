@@ -1,13 +1,14 @@
 import inquirer from "inquirer";
-import Client, { AuthenticatedRole } from "vex-tm-client";
+import { Client } from "vex-tm-client";
 import OBSWebSocket from "obs-websocket-js";
 import { Atem } from "atem-connection";
+import vextm from "../secret/vextm.json";
+import { log } from "./main";
 
 export async function getTournamentManagerCredentials(): Promise<{
   address: string;
-  password: string;
 }> {
-  return inquirer.prompt([
+  let { address } = await inquirer.prompt([
     {
       type: "input",
       message: "VEX TM Address:",
@@ -15,14 +16,12 @@ export async function getTournamentManagerCredentials(): Promise<{
       default() {
         return "127.0.0.1";
       },
-    },
-    {
-      type: "password",
-      message: "VEX TM Password:",
-      mask: "*",
-      name: "password",
-    },
+    }
   ]);
+
+  const url = new URL(`http://${address}`);
+
+  return { address: url.toString() };
 }
 
 export async function getOBSCredentials(): Promise<{
@@ -91,7 +90,7 @@ export async function getCredentials() {
   return { tm, obs, atem };
 }
 
-async function keypress() {
+export async function keypress() {
   return new Promise((resolve, reject) => {
     process.stdin.setRawMode(true);
     process.stdin.resume();
@@ -101,27 +100,30 @@ async function keypress() {
 
 export async function connectTM({
   address,
-  password,
 }: {
   address: string;
-  password: string;
 }) {
   const client = new Client(
-    `http://${address}`,
-    AuthenticatedRole.ADMINISTRATOR,
-    password
+    {
+      address,
+      authorization: {
+        client_id: vextm.client_id,
+        client_secret: vextm.client_secret,
+        expiration_date: vextm.expiration_date,
+        grant_type: "client_credentials"
+      }
+    }
   );
 
-  try {
-    await client.connect();
-  } catch (e: any) {
-    console.log("❌ Tournament Manager: " + e.message);
+  const result = await client.connect();
+  if (!result.success) {
+    log("error", `Tournament Manager: ${result.error}`, `❌ Tournament Manager: ${result.error}`);
 
-    if (e.message.includes("cookie")) {
-      console.log("\nCould not automatically generate cookie. Check to ensure you are connecting to the correct address.");
-    } else if (e.message.includes("ECONNREFUSED")) {
-      console.log("\nCould not connect to the Tournament Manager server. Ensure you have started it and that the address is correct. ");
-    };
+    if (result.origin === "bearer") {
+      log("error", `${result.origin} ${result.error_details}`, `DWAB Authorization Failed. Check your internet connection. ${result.error} ${result.error_details}`);
+    } else {
+      log("error", `${result.origin} ${result.error_details}`, `Connection to Tournament Manager Failed. Check your TM Address. ${result.error} ${result.error_details}`);
+    }
 
     await keypress();
     process.exit(1);
@@ -141,7 +143,7 @@ export async function connectOBS(creds: { address: string; password: string } | 
     await obs.connect(creds.address, creds.password);
     return obs;
   } catch (e: any) {
-    console.log("❌ Open Broadcaster Studio: ", e);
+    log("error", `Open Broadcaster Studio: ${e}`, `❌ Open Broadcaster Studio: ${e}`);
 
     await keypress();
     process.exit(1);
@@ -165,7 +167,7 @@ export async function connectATEM(creds: { address: string } | null): Promise<At
     atem.connect(creds?.address);
 
     const timeout = setTimeout(async () => {
-      console.log("❌ ATEM: Could not connect to switcher");
+      log("error", `❌ ATEM: Could not connect to switcher`);
       atem.disconnect();
 
       await keypress();
@@ -174,8 +176,8 @@ export async function connectATEM(creds: { address: string } | null): Promise<At
 
     atem.on("connected", () => {
       clearTimeout(timeout);
-      atem.on("info", message => console.log(`[${new Date().toISOString()}] [atem] info: ${message}`));
-      atem.on("error", message => console.log(`[${new Date().toISOString()}] [atem] error: ${message}`));
+      atem.on("info", message => log("info", `ATEM: ${message}`));
+      atem.on("error", message => log("error", `ATEM: ${message}`));
 
       resolve(atem)
     });

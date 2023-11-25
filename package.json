@@ -2,20 +2,20 @@
   "name": "tm-switcher",
   "version": "1.6.2",
   "main": "src/main.ts",
-  "bin": "out/main.js",
+  "bin": "out/switcher/main.js",
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "bundle": "npm run build && rm -rf bundle && pkg package.json --out-path bundle --targets latest-macos-x64,latest-win-x64,latest-linux-x64",
-    "run": "rm -rf out && tsc && node out/main.js",
-    "rb": "npm run build && npm run bundle && ./bundle/main-macos"
+    "bundle": "npm run build && rm -rf bundle && pkg package.json",
+    "run": "rm -rf out && tsc && node out/switcher/main.js",
+    "rb": "npm run bundle && ./bundle/tm-switcher-macos"
   },
   "dependencies": {
     "@types/inquirer": "^7.3.1",
     "atem-connection": "^3.0.1",
     "inquirer": "^7.3.3",
     "obs-websocket-js": "^5.0.1",
-    "vex-tm-client": "^0.4.4"
+    "vex-tm-client": "^1.0.3"
   },
   "pkg": {
     "assets": [
@@ -30,6 +30,7 @@
     "outputPath": "bundle"
   },
   "devDependencies": {
+    "@types/node": "^20.9.4",
     "pkg": "^5.8.1",
     "typescript": "^4.8.3"
   }

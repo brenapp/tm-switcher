@@ -3,3 +3,5 @@ bundle
 out
 .DS_Store
 secret
+
+*.csv

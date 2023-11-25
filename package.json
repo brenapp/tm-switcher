@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "bundle": "npm run build && rm -rf bundle && pkg package.json",
+    "bundle": "npm run build && rm -rf bundle && pkg package.json --options no-warnings",
     "run": "rm -rf out && tsc && node out/switcher/main.js",
     "rb": "npm run bundle && ./bundle/tm-switcher-macos"
   },
@@ -20,7 +20,7 @@
   "pkg": {
     "assets": [
       "node_modules/@julusian/freetype2/prebuilds/**/*",
-      "node_modules/vex-tm-client/out/proto/**"
+      "secret/**/*"
     ],
     "targets": [
       "latest-macos-x64",

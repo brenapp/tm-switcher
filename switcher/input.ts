@@ -219,7 +219,7 @@ export async function getFileHandles(): Promise<FileHandles> {
     const logPath = join(tmpdir(), `tm_switcher_${date}_log.txt`);
     const log = await fs.open(logPath, "a");
 
-    await await log.write(`\n\ntm-switcher v${process.env.npm_package_version} started at ${new Date().toISOString()}\n`);
+    await log.write(`\n\ntm-switcher v${process.env.npm_package_version} started at ${new Date().toISOString()}\n`);
     await log.write(`OS:  ${process.platform} ${process.arch}\n`);
     await log.write(`Node Version:  ${process.version}\n`);
     await log.write(`Directory:  ${directory}\n`);

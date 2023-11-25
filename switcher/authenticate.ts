@@ -141,6 +141,13 @@ export async function connectOBS(creds: { address: string; password: string } | 
 
   try {
     await obs.connect(creds.address, creds.password);
+    const version = await obs.call("GetVersion");
+
+    log("info", `OBS Version: ${version.obsVersion}`, false);
+    log("info", ` WebSocket: ${version.obsWebSocketVersion}`, false);
+    log("info", ` Platform: ${version.platformDescription}`, false);
+    log("info", ` RPC: ${version.rpcVersion}`, false);
+
     return obs;
   } catch (e: any) {
     log("error", `Open Broadcaster Studio: ${e}`, `❌ Open Broadcaster Studio: ${e}`);
@@ -178,6 +185,10 @@ export async function connectATEM(creds: { address: string } | null): Promise<At
       clearTimeout(timeout);
       atem.on("info", message => log("info", `ATEM: ${message}`));
       atem.on("error", message => log("error", `ATEM: ${message}`));
+
+      for (const [name, input] of Object.entries(atem.state?.inputs ?? {})) {
+        log("info", `ATEM Input Discovered: ${input?.shortName} (${name})`);
+      }
 
       resolve(atem)
     });

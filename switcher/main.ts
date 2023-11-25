@@ -44,10 +44,10 @@ export function Behavior(name: string, behavior: Behavior) {
 
 let LOG_HANDLE: FileHandle | null = null;
 
-export function log(level: string, message: string, stdout?: string) {
+export function log(level: string, message: string, stdout?: string | false) {
   if (stdout) {
     console.log(stdout);
-  } else {
+  } else if (stdout !== false) {
     console.log(`[${new Date().toISOString()}] ${level}: ${message}`);
   }
   LOG_HANDLE?.write(`[${new Date().toISOString()}] ${level}: ${message}\n`);
@@ -66,6 +66,7 @@ async function main() {
   // Prompt the user for credentials
   const creds = await getCredentials();
 
+  console.log("");
   log("info", "Connecting to servers: ", "Connecting to servers: ");
 
   const tm = await connectTM(creds.tm);
@@ -73,7 +74,7 @@ async function main() {
 
   const obs = await connectOBS(creds.obs);
   if (obs) {
-    log("info", "Connected to OBS", "✅ OBS");
+    log("info", "Connected to OBS", `✅ OBS`);
   }
 
   const atem = await connectATEM(creds.atem);

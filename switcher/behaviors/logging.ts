@@ -1,6 +1,6 @@
 import { Behavior } from "./index";
 import { log } from "../utils/logging";
-import { getMatchName } from "../utils/output";
+import { getMatchName } from "../utils/match";
 import { MatchTuple } from "vex-tm-client";
 
 /**
@@ -37,8 +37,6 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
 
         const matchName = currentMatch ? getMatchName(currentMatch) : "Match";
         log("info", `[${timecode}] ${matchName} started on field ${fieldID} [OBS: ${association?.obs ?? "none"}, ATEM: ${association?.atem ?? "none"}]`);
-
-
     });
 
     fieldset.on("matchStopped", async event => {
@@ -69,7 +67,17 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
         log("info", `[${timecode}] info: ${matchName} assigned to field ${fieldID} [OBS: ${association?.obs ?? "none"}, ATEM: ${association?.atem ?? "none"}]`);
     });
 
-    fieldset.on("audienceDisplayChanged", event => {
-        log("info", `Audience display changed to ${event.display}`);
+    fieldset.on("audienceDisplayChanged", async event => {
+        const timecode = await getCurrentTimecode();
+
+        log("info", `[${timecode}] Audience display changed to ${event.display}`);
     });
+
+    fieldset.websocket?.addEventListener("message", event => {
+        log("info", `TM: ${event.data}`, false);
+    });
+
+    fieldset.websocket?.addEventListener("close", event => {
+        log("error", `TM: ${event.reason}`, false);
+    })
 });

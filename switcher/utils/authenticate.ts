@@ -123,11 +123,7 @@ export async function connectTM({
   if (!result.success) {
     log("error", `Tournament Manager: ${result.error}`, `❌ Tournament Manager: ${result.error}`);
 
-    if (result.origin === "bearer") {
-      log("error", `${result.origin} ${result.error_details}`, `DWAB Authorization Failed. Check your internet connection. ${result.error} ${result.error_details}`);
-    } else {
-      log("error", `${result.origin} ${result.error_details}`, `Connection to Tournament Manager Failed. Check your TM Address. ${result.error} ${result.error_details}`);
-    }
+    log("error", `${JSON.stringify(result.error_details)}`, false);
 
     await keypress();
     process.exit(1);

@@ -14,11 +14,11 @@ This application provides automation to simplify the workload of running a lives
 
 - Support for events with multiple fieldsets and multiple divisions. This software assumes that _each_ fieldset has its own livestream, so you will need to run an instance of the switcher for every livestream you wish to control.
 
-<img width="1124" alt="image" src="https://github.com/MayorMonty/tm-obs-switcher/assets/8839926/217ed739-fefb-4aa6-b24f-ace06457a8c7">
+<img width="1124" alt="image" src="https://github.com/brenapp/tm-obs-switcher/assets/8839926/217ed739-fefb-4aa6-b24f-ace06457a8c7">
 
 ## Install
 
-Download the most recent build for your OS from [releases](https://github.com/MayorMonty/tm-obs-switcher/releases/), and run!
+Download the most recent build for your OS from [releases](https://github.com/brenapp/tm-obs-switcher/releases/), and run!
 
 ## Run From Source
 

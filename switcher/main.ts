@@ -70,15 +70,10 @@ async function main() {
       audienceDisplayOptions,
       associations,
       recordingOptions,
-      connections: { tm, obs, atem }
+      connections: { tm, obs, atem },
+      handles
     });
   }
-
-  // Cleanup
-  process.on("exit", async () => {
-    log("info", "exiting...");
-    await attachments.fieldset.disconnect();
-  });
 }
 
 

@@ -1,14 +1,16 @@
 import { Behavior } from "./index";
 import { log } from "../utils/logging";
-import { getMatchName } from "../utils/match";
-import { MatchTuple } from "vex-tm-client";
+import { getMatchName, matchesEqual } from "../utils/match";
+import { MatchAlliance, MatchTuple, TMErrors } from "vex-tm-client";
 
 /**
  * Logging
  */
-Behavior("LOGGING", async ({ associations, attachments, connections, recordingOptions }) => {
+Behavior("LOGGING", async ({ associations, attachments, connections, recordingOptions, handles }) => {
 
     const { obs } = connections;
+    const { division, fieldset } = attachments;
+    const { timestamp } = handles;
 
     async function getCurrentTimecode() {
         const recordStatus = await obs?.call("GetRecordStatus");
@@ -26,7 +28,6 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
         return timecode;
     };
 
-    const { fieldset } = attachments;
 
     let currentMatch: MatchTuple | null = null;
 
@@ -37,6 +38,23 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
 
         const matchName = currentMatch ? getMatchName(currentMatch) : "Match";
         log("info", `[${timecode}] ${matchName} started on field ${fieldID} [OBS: ${association?.obs ?? "none"}, ATEM: ${association?.atem ?? "none"}]`);
+
+        let alliances: MatchAlliance[] = [];
+
+        const matches = await division.getMatches();
+        if (!matches.success) {
+            log("error", `Could not fetch matches from Tournament Manager: ${matches.error}`);
+        } else {
+            const match = matches.data.find(m => matchesEqual(m.matchInfo.matchTuple, currentMatch));
+            if (match) {
+                alliances = match.matchInfo.alliances;
+            }
+        }
+
+        const teams = alliances.map(alliance => alliance.teams.map(team => team.number).join(" ")).join(" ");
+        timestamp.write(`${new Date().toISOString()},${timecode},${matchName},${teams}\n`);
+
+
     });
 
     fieldset.on("matchStopped", async event => {

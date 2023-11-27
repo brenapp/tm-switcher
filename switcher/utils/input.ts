@@ -172,7 +172,7 @@ export async function getAudienceDisplayOptions(): Promise<AudienceDisplayOption
     const choices = [
         { name: "Show intro upon field activation", value: "queueIntro" },
         { name: "Show saved score 3 seconds after match", value: "savedScore" },
-        { name: "Flash rankings 3 seconds after every 6th match", value: "flashRankings" }
+        { name: "Show rankings 3 seconds after every 6th match", value: "flashRankings" }
     ] as const;
 
     const response: { options: (keyof AudienceDisplayOptions)[] } = await inquirer.prompt([
@@ -211,7 +211,7 @@ export async function getFileHandles(): Promise<FileHandles> {
     const stat = await timestamp.stat();
 
     if (stat.size < 1) {
-        timestamp.write("TIMESTAMP,OBS_TIME,MATCH\n");
+        timestamp.write("TIMESTAMP,OBS_TIME,MATCH,TEAMS\n");
     }
 
     const logPath = join(tmpdir(), `tm_switcher_${date}_log.txt`);

@@ -64,6 +64,7 @@ async function main() {
   console.log("");
 
   for (const [name, behavior] of Object.entries(BEHAVIORS)) {
+    log("info", `Running behavior: ${name}`, false);
     await behavior({
       attachments,
       audienceDisplayOptions,

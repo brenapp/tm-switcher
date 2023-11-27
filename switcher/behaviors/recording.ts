@@ -1,6 +1,7 @@
-import { MatchTuple } from "vex-tm-client";
+import { Client, MatchTuple } from "vex-tm-client";
 import { Behavior } from "./index";
-import { getMatchName } from "../utils/output";
+import { getMatchName, matchesEqual } from "../utils/match";
+import { log } from "console";
 
 /**
  * Match Recording
@@ -9,7 +10,15 @@ Behavior("MATCH_RECORDING", async ({ associations, attachments, connections, rec
 
     const { recordIndividualMatches } = recordingOptions;
     const { division, fieldset } = attachments;
-    const { obs } = connections;
+    const { obs, tm } = connections;
+
+    let multipleDivisions = false;
+    const divisions = await tm.getDivisions();
+    if (!divisions.success) {
+        log("error", `Failed to fetch divisions. ${divisions.error}`);
+    } else {
+        multipleDivisions = divisions.data.length > 1;
+    }
 
     let defaultFileFormat = "";
     if (obs) {
@@ -31,9 +40,27 @@ Behavior("MATCH_RECORDING", async ({ associations, attachments, connections, rec
         const { outputActive } = await obs.call("GetRecordStatus");
         if (outputActive) return;
 
-        const filename = `${division?.name ?? ""}_${(currentMatch ? getMatchName(currentMatch) : "Match").replaceAll(/ /g, "_")} `;
+        let filename = [`${new Date().toISOString().replace(/:/g, "-")}`];
 
-        await obs.call("SetProfileParameter", { parameterCategory: "Output", parameterName: "FilenameFormatting", parameterValue: filename })
+        if (multipleDivisions) {
+            filename.push(`${division.name}`);
+        }
+
+        filename.push(currentMatch ? getMatchName(currentMatch) : "Match");
+
+        const matches = await division.getMatches();
+        if (!matches.success) {
+            log("error", `Failed to fetch matches. ${matches.error}`);
+        } else {
+            const match = matches.data.find(m => matchesEqual(m.matchInfo.matchTuple, currentMatch));
+
+
+            for (const alliance of match?.matchInfo.alliances ?? []) {
+                filename.push(`${alliance.teams.map(t => t.number).join("_")}`);
+            };
+        };
+
+        await obs.call("SetProfileParameter", { parameterCategory: "Output", parameterName: "FilenameFormatting", parameterValue: filename.join("_") })
         await obs.call("StartRecord");
     };
 

@@ -6,36 +6,36 @@ export function getMatchName(match: MatchTuple) {
 
     switch (match.round) {
         case MatchRound.Qualification:
-            return `Qualification ${match.match}`;
+            return `Q ${match.match}`;
         case MatchRound.Practice:
-            return `Practice ${match.match}`;
+            return `P ${match.match}`;
 
         case MatchRound.RoundRobin:
-            return `Round Robin ${match.instance}`;
+            return `RR ${match.instance}-${match.match}`;
 
         case MatchRound.RoundOf128:
-            return `Round of 128 ${match.instance} - ${match.match}`;
+            return `R128 ${match.instance}-${match.match}`;
 
         case MatchRound.RoundOf64:
-            return `Round of 64 ${match.instance} - ${match.match}`;
+            return `R64 ${match.instance}-${match.match}`;
 
         case MatchRound.RoundOf32:
-            return `Round of 32 ${match.instance} - ${match.match}`;
+            return `R32 ${match.instance}-${match.match}`;
 
         case MatchRound.RoundOf16:
-            return `Round of 16 ${match.instance} - ${match.match}`;
+            return `R16 ${match.instance}-${match.match}`;
 
         case MatchRound.Quarterfinal:
-            return `Quarterfinal ${match.instance} - ${match.match}`;
+            return `QF ${match.instance}-${match.match}`;
 
         case MatchRound.Semifinal:
-            return `Semifinal ${match.instance} - ${match.match}`;
+            return `SF ${match.instance}-${match.match}`;
 
         case MatchRound.Final:
-            return `Final ${match.instance} - ${match.match}`;
+            return `F ${match.instance}-${match.match}`;
 
         case MatchRound.TopN:
-            return `Final ${match.instance} - ${match.match}`;
+            return `F ${match.match}`;
 
         case MatchRound.Skills:
             return `Skills`;

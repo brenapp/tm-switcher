@@ -1,4 +1,4 @@
-import { FieldsetAudienceDisplay, MatchRound, MatchTuple } from "vex-tm-client";
+import { FieldsetActiveMatchType, FieldsetAudienceDisplay } from "vex-tm-client";
 import { Behavior } from "./index";
 import { log } from "../utils/logging";
 
@@ -9,12 +9,6 @@ Behavior("AUDIENCE_DISPLAY", async ({ attachments, audienceDisplayOptions }) => 
 
     const { fieldset } = attachments;
 
-    let currentMatch: MatchTuple | null = null;
-
-    fieldset.on("fieldMatchAssigned", async event => {
-        currentMatch = event.match;
-    });
-
     fieldset.on("fieldActivated", async event => {
         if (audienceDisplayOptions.queueIntro) {
             log("info", "Field activated, showing intro");
@@ -22,21 +16,19 @@ Behavior("AUDIENCE_DISPLAY", async ({ attachments, audienceDisplayOptions }) => 
         }
     });
 
-    fieldset.on("matchStopped", () => {
+    fieldset.on("matchStopped", async () => {
 
-        if (!currentMatch) return;
-        if (currentMatch.round !== MatchRound.Qualification && currentMatch.round !== MatchRound.Practice) return;
+        const match = fieldset.state.match;
+        if (match.type !== FieldsetActiveMatchType.Match) {
+            return;
+        }
 
-        if (audienceDisplayOptions.flashRankings && currentMatch.match % 6 === 0) {
-            setTimeout(async () => {
-                log("info", "Match ended, showing rankings");
-                await fieldset.setAudienceDisplay(FieldsetAudienceDisplay.Rankings);
-            }, 3000);
+        if (audienceDisplayOptions.flashRankings && match.match.match % 6 === 0) {
+            log("info", "Match ended, showing rankings");
+            await fieldset.setAudienceDisplay(FieldsetAudienceDisplay.Rankings);
         } else if (audienceDisplayOptions.savedScore) {
-            setTimeout(async () => {
-                log("info", "Match ended, showing saved match results");
-                await fieldset.setAudienceDisplay(FieldsetAudienceDisplay.SavedMatchResults);
-            }, 3000);
+            log("info", "Match ended, showing saved match results");
+            await fieldset.setAudienceDisplay(FieldsetAudienceDisplay.SavedMatchResults);
         }
 
     });

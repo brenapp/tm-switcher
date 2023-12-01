@@ -1,8 +1,17 @@
-import { MatchRound, MatchTuple } from "vex-tm-client";
+import { FieldsetActiveMatchType, FieldsetMatch } from "vex-tm-client";
+import { MatchRound, MatchTuple } from "vex-tm-client/out/Match";
 
-export function getMatchName(match: MatchTuple) {
+export function getMatchName(fieldsetMatch: FieldsetMatch) {
 
-    if (Object.keys(match).length === 0) return "Timeout";
+    if (fieldsetMatch.type === FieldsetActiveMatchType.None) {
+        return "Match";
+    }
+
+    if (fieldsetMatch.type === FieldsetActiveMatchType.Timeout) {
+        return "Timeout";
+    };
+
+    const match = fieldsetMatch.match;
 
     switch (match.round) {
         case MatchRound.Qualification:
@@ -45,6 +54,19 @@ export function getMatchName(match: MatchTuple) {
 
     }
 };
+
+export function getUnderlyingMatch(fieldsetMatch: FieldsetMatch) {
+    if (fieldsetMatch.type === FieldsetActiveMatchType.None) {
+        return null;
+    }
+
+    if (fieldsetMatch.type === FieldsetActiveMatchType.Timeout) {
+        return null
+    };
+
+    return fieldsetMatch.match;
+};
+
 
 export function matchesEqual(a: MatchTuple | null, b: MatchTuple | null) {
     if (!a || !b) return false;

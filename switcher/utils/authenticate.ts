@@ -82,7 +82,13 @@ export async function getATEMCredentials(): Promise<{ address: string } | null> 
 
 };
 
-export async function getCredentials() {
+export type Credentials = {
+  tm: { address: string };
+  obs: { address: string; password: string } | null;
+  atem: { address: string } | null;
+}
+
+export async function getCredentials(): Promise<Credentials> {
   const tm = await getTournamentManagerCredentials();
   const obs = await getOBSCredentials();
   const atem = await getATEMCredentials();

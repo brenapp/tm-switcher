@@ -171,8 +171,8 @@ export async function getAudienceDisplayOptions(): Promise<AudienceDisplayOption
 
     const choices = [
         { name: "Show intro upon field activation", value: "queueIntro" },
-        { name: "Show saved score 3 seconds after match", value: "savedScore" },
-        { name: "Show rankings 3 seconds after every 6th match", value: "flashRankings" }
+        { name: "Show saved score after match", value: "savedScore" },
+        { name: "Show rankings after every 6th match", value: "flashRankings" }
     ] as const;
 
     const response: { options: (keyof AudienceDisplayOptions)[] } = await inquirer.prompt([

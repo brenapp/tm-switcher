@@ -1,7 +1,7 @@
-import { Client, MatchTuple } from "vex-tm-client";
 import { Behavior } from "./index";
-import { getMatchName, matchesEqual } from "../utils/match";
+import { getMatchName, getUnderlyingMatch, matchesEqual } from "../utils/match";
 import { log } from "console";
+import { FieldsetActiveMatchType } from "vex-tm-client";
 
 /**
  * Match Recording
@@ -46,13 +46,13 @@ Behavior("MATCH_RECORDING", async ({ associations, attachments, connections, rec
             filename.push(`${division.name}`);
         }
 
-        filename.push(currentMatch ? getMatchName(currentMatch) : "Match");
+        const currentMatch = fieldset.state.match
 
         const matches = await division.getMatches();
         if (!matches.success) {
             log("error", `Failed to fetch matches. ${matches.error}`);
         } else {
-            const match = matches.data.find(m => matchesEqual(m.matchInfo.matchTuple, currentMatch));
+            const match = matches.data.find(m => matchesEqual(m.matchInfo.matchTuple, getUnderlyingMatch(currentMatch)));
 
 
             for (const alliance of match?.matchInfo.alliances ?? []) {
@@ -74,14 +74,13 @@ Behavior("MATCH_RECORDING", async ({ associations, attachments, connections, rec
         await obs.call("SetProfileParameter", { parameterCategory: "Output", parameterName: "FilenameFormatting", parameterValue: defaultFileFormat })
     }
 
-    let currentMatch: MatchTuple | null = null;
-
-    fieldset.on("fieldMatchAssigned", async event => {
-        const { match } = event;
-        currentMatch = match;
-    });
-
     fieldset.on("matchStarted", async event => {
+
+        const match = fieldset.state.match;
+        if (match.type !== FieldsetActiveMatchType.Match) {
+            return;
+        }
+
         await startRecording();
     });
 

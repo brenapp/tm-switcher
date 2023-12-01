@@ -1,7 +1,7 @@
 import { Behavior } from "./index";
 import { log } from "../utils/logging";
-import { getMatchName, matchesEqual } from "../utils/match";
-import { MatchAlliance, MatchTuple, TMErrors } from "vex-tm-client";
+import { getMatchName, getUnderlyingMatch, matchesEqual } from "../utils/match";
+import type { MatchAlliance, MatchTuple } from "vex-tm-client/out/Match";
 
 /**
  * Logging
@@ -29,14 +29,12 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
     };
 
 
-    let currentMatch: MatchTuple | null = null;
-
     fieldset.on("matchStarted", async event => {
         const timecode = await getCurrentTimecode();
         const { fieldID } = event;
         const association = associations[fieldID];
 
-        const matchName = currentMatch ? getMatchName(currentMatch) : "Match";
+        const matchName = fieldset.state.match ? getMatchName(fieldset.state.match) : "Match";
         log("info", `[${timecode}] ${matchName} started on field ${fieldID} [OBS: ${association?.obs ?? "none"}, ATEM: ${association?.atem ?? "none"}]`);
 
         let alliances: MatchAlliance[] = [];
@@ -45,7 +43,7 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
         if (!matches.success) {
             log("error", `Could not fetch matches from Tournament Manager: ${matches.error}`);
         } else {
-            const match = matches.data.find(m => matchesEqual(m.matchInfo.matchTuple, currentMatch));
+            const match = matches.data.find(m => matchesEqual(m.matchInfo.matchTuple, getUnderlyingMatch(fieldset.state.match)));
             if (match) {
                 alliances = match.matchInfo.alliances;
             }
@@ -60,7 +58,8 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
     fieldset.on("matchStopped", async event => {
         const timecode = await getCurrentTimecode();
         const { fieldID } = event;
-        const matchName = currentMatch ? getMatchName(currentMatch) : "Match";
+        const matchName = fieldset.state.match ? getMatchName(fieldset.state.match) : "Match";
+
 
         log("info", `[${timecode}] ${matchName} ended on field ${fieldID} `);
     });
@@ -70,18 +69,17 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
         const { fieldID } = event;
         const association = associations[fieldID];
 
-        const matchName = currentMatch ? getMatchName(currentMatch) : "Match";
+        const matchName = fieldset.state.match ? getMatchName(fieldset.state.match) : "Match";
+
         log("info", `[${timecode}] ${matchName} activated on field ${fieldID} [OBS: ${association?.obs ?? "none"}, ATEM: ${association?.atem ?? "none"}]`);
     });
 
     fieldset.on("fieldMatchAssigned", async event => {
         const timecode = await getCurrentTimecode();
-        const { fieldID, match } = event;
+        const { fieldID } = event;
         const association = associations[fieldID];
 
-        currentMatch = match;
-
-        const matchName = getMatchName(match);
+        const matchName = getMatchName(fieldset.state.match);
         log("info", `[${timecode}] info: ${matchName} assigned to field ${fieldID} [OBS: ${association?.obs ?? "none"}, ATEM: ${association?.atem ?? "none"}]`);
     });
 

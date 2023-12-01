@@ -19,6 +19,7 @@ import "./behaviors/display";
 import "./behaviors/recording";
 import "./behaviors/switcher";
 import "./behaviors/logging";
+import "./behaviors/heartbeat";
 
 async function main() {
   console.log(`tm-obs-switcher v${require("../../package.json").version}`);
@@ -71,7 +72,8 @@ async function main() {
       associations,
       recordingOptions,
       connections: { tm, obs, atem },
-      handles
+      handles,
+      credentials: creds
     });
   }
 }

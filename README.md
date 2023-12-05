@@ -35,7 +35,7 @@ information about obtaining these can be found in the [REC Foundation Knowledge 
 1. Clone or download this repository
 
 ```
-git clone git@github.com:MayorMonty/tm-obs-switcher.git
+git clone git@github.com:brenapp/tm-obs-switcher.git
 cd tm-obs-switcher
 ```
 
@@ -84,6 +84,8 @@ Some key implementation details to be aware of when deploying this at your event
   have a lifetime of around 2 hours, and TM Switcher requests a new token every hour. This means
   that if your device running the switcher loses access to the internet, you have at least an hour
   to regain the connection before TM rejects the integration.
+
+- You will need to supply an API Key from Tournament Manager. This can be obtained from `Tools > Options > Web Publishing`.
 
 If your event has trouble with this tool, please get in touch with me!
 

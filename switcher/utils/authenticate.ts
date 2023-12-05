@@ -5,10 +5,13 @@ import { Atem } from "atem-connection";
 import vextm from "../../secret/vextm.json";
 import { log } from "./logging";
 
-export async function getTournamentManagerCredentials(): Promise<{
+export type TMCredentials = {
   address: string;
-}> {
-  let { address } = await inquirer.prompt([
+  key: string;
+}
+
+export async function getTournamentManagerCredentials(): Promise<TMCredentials> {
+  let { address, key } = await inquirer.prompt([
     {
       type: "input",
       message: "VEX TM Address:",
@@ -16,18 +19,25 @@ export async function getTournamentManagerCredentials(): Promise<{
       default() {
         return "127.0.0.1";
       },
+    },
+    {
+      type: "input",
+      message: "VEX TM API Key:",
+      name: "key"
     }
   ]);
 
   const url = new URL(`http://${address}`);
 
-  return { address: url.toString() };
+  return { address: url.toString(), key };
 }
 
-export async function getOBSCredentials(): Promise<{
+export type OBSCredentials = {
   address: string;
   password: string;
-} | null> {
+}
+
+export async function getOBSCredentials(): Promise<OBSCredentials | null> {
 
   const { useOBS }: { useOBS: boolean } = await inquirer.prompt([{
     type: "confirm",
@@ -58,7 +68,11 @@ export async function getOBSCredentials(): Promise<{
   ]);
 }
 
-export async function getATEMCredentials(): Promise<{ address: string } | null> {
+export type ATEMCredentials = {
+  address: string;
+};
+
+export async function getATEMCredentials(): Promise<ATEMCredentials | null> {
 
   const { useAtem }: { useAtem: boolean } = await inquirer.prompt([{
     type: "confirm",
@@ -83,9 +97,9 @@ export async function getATEMCredentials(): Promise<{ address: string } | null> 
 };
 
 export type Credentials = {
-  tm: { address: string };
-  obs: { address: string; password: string } | null;
-  atem: { address: string } | null;
+  tm: TMCredentials;
+  obs: OBSCredentials | null;
+  atem: ATEMCredentials | null;
 }
 
 export async function getCredentials(): Promise<Credentials> {
@@ -110,9 +124,8 @@ export async function keypress() {
 
 export async function connectTM({
   address,
-}: {
-  address: string;
-}) {
+  key
+}: TMCredentials) {
   const client = new Client(
     {
       address,
@@ -121,7 +134,9 @@ export async function connectTM({
         client_secret: vextm.client_secret,
         expiration_date: vextm.expiration_date,
         grant_type: "client_credentials"
-      }
+      },
+      clientAPIKey: key,
+      bearerMargin: 30 * 60 // refresh the bearer with 30 minutes remaining
     }
   );
 
@@ -138,7 +153,7 @@ export async function connectTM({
   return client;
 }
 
-export async function connectOBS(creds: { address: string; password: string } | null) {
+export async function connectOBS(creds: OBSCredentials | null) {
   const obs = new OBSWebSocket();
 
   if (!creds) {
@@ -163,7 +178,7 @@ export async function connectOBS(creds: { address: string; password: string } | 
   };
 }
 
-export async function connectATEM(creds: { address: string } | null): Promise<Atem | null> {
+export async function connectATEM(creds: ATEMCredentials | null): Promise<Atem | null> {
 
   if (!creds?.address) {
     return null;

@@ -11,7 +11,7 @@ export type TMCredentials = {
 }
 
 export async function getTournamentManagerCredentials(): Promise<TMCredentials> {
-  let { address, key } = await inquirer.prompt([
+  let { address, key } = await inquirer.prompt<TMCredentials>([
     {
       type: "input",
       message: "VEX TM Address:",
@@ -50,7 +50,7 @@ export async function getOBSCredentials(): Promise<OBSCredentials | null> {
     return null;
   }
 
-  return inquirer.prompt([
+  return inquirer.prompt<OBSCredentials>([
     {
       type: "input",
       message: "OBS Websocket Address:",
@@ -83,7 +83,7 @@ export async function getATEMCredentials(): Promise<ATEMCredentials | null> {
 
   if (useAtem) {
 
-    const { address }: { address: string } = await inquirer.prompt([{
+    const { address } = await inquirer.prompt<ATEMCredentials>([{
       type: "input",
       message: "ATEM Address:",
       name: "address"

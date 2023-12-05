@@ -22,7 +22,7 @@ import "./behaviors/logging";
 import "./behaviors/heartbeat";
 
 async function main() {
-  console.log(`tm-obs-switcher v${require("../../package.json").version}`);
+  console.log(`tm-switcher v${require("../../package.json").version}`);
   console.log("Created by Brendan McGuire (brendan@bren.app)\n");
 
   // Logging

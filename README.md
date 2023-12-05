@@ -35,7 +35,7 @@ information about obtaining these can be found in the [REC Foundation Knowledge 
 1. Clone or download this repository
 
 ```
-git clone git@github.com:brenapp/tm-obs-switcher.git
+git clone git@github.com:brenapp/tm-switcher.git
 cd tm-obs-switcher
 ```
 

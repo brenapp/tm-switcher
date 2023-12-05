@@ -1,4 +1,4 @@
-import inquirer from "inquirer";
+import inquirer, { DistinctQuestion, QuestionCollection } from "inquirer";
 import ObsWebSocket from "obs-websocket-js";
 import { Client, Division, Fieldset } from "vex-tm-client";
 import { join } from "path";
@@ -106,15 +106,18 @@ export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket | nu
     const associations: FieldAssociations = {};
 
     for (const field of fields.data) {
-        const questions = [];
+        const questions: DistinctQuestion[] = [];
+        const initial: FieldAssociation = { obs: undefined, atem: undefined };
 
         if (obs && scenes.scenes.length > 0) {
+            const defaultValue = scenes.scenes.find(s => `${s.sceneName}`.toLowerCase() === field.name.toLowerCase())?.sceneName as string | undefined;
             questions.push(
                 {
                     name: "obs",
                     type: "list",
                     message: `What OBS scene do you want to associate with ${field.name}? `,
-                    choices: scenes.scenes.map((s) => s.sceneName),
+                    choices: scenes.scenes.map((s) => s.sceneName as string),
+                    default: defaultValue
                 },
             );
         }
@@ -122,17 +125,19 @@ export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket | nu
         if (atem && atem.state) {
 
             const inputs = Object.entries(atem.state?.inputs);
+            const defaultValue = Number.parseInt(inputs.find(([value, input]) => input?.shortName.toLowerCase() === field.name.toLowerCase())?.[0] ?? "NaN");
             questions.push(
                 {
                     name: "atem",
                     type: "list",
                     message: `What ATEM input do you want to associate with ${field.name}? `,
-                    choices: inputs.map(([value, input]) => ({ name: input?.shortName, value: Number.parseInt(value) }))
+                    choices: inputs.map(([value, input]) => ({ name: input?.shortName, value: Number.parseInt(value) })),
+                    default: isNaN(defaultValue) ? undefined : defaultValue
                 }
             );
         }
 
-        const response: FieldAssociation = await inquirer.prompt(questions);
+        const response = await inquirer.prompt<FieldAssociation>(questions);
         associations[field.id] = response;
     };
 

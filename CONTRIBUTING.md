@@ -16,7 +16,7 @@ information about obtaining these can be found in the [REC Foundation Knowledge 
 
 ```
 git clone git@github.com:brenapp/tm-switcher.git
-cd tm-obs-switcher
+cd tm-switcher
 ```
 
 2. Enter your client credentials issued by DWAB

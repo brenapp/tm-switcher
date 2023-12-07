@@ -8,6 +8,11 @@ software installed:
 
 - [Nodejs](https://nodejs.org) v14
 - [Git](https://git-scm.com) (recommended)
+- npm modules
+  - typescript
+  - atem-connection
+  - obs-websocket-js
+  - vex-tm-client
 
 To run from source, you would need to supply your third-party credentials from DWAB. More
 information about obtaining these can be found in the [REC Foundation Knowledge Base](https://kb.roboticseducation.org/hc/en-us/articles/19238156122135)
@@ -31,10 +36,10 @@ Edit `secret/vextm.json` to include your client credentials. It should look some
 
 ```json
 {
-  "client_id": "<client ID issues by DWAB>",
+  "client_id": "<client ID issued by DWAB>",
   "client_secret": "<client secret issued by DWAB>",
   "grant_type": "client_credentials",
-  "expiration_date": 171484800000 // Timestamp, in MS, when your credentials expire
+  "expiration_date": "<client credential expiration issued by DWAB converted to MS>" // Google "convert time to ms" for conversion tools
 }
 ```
 

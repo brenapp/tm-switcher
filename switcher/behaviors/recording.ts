@@ -1,7 +1,7 @@
 import { Behavior } from "./index";
 import { getMatchName, getUnderlyingMatch, matchesEqual } from "../utils/match";
-import { log } from "console";
-import { FieldsetActiveMatchType } from "vex-tm-client";
+import { FieldsetActiveMatchType, Match } from "vex-tm-client";
+import { log } from "../utils/logging";
 
 /**
  * Match Recording
@@ -11,6 +11,12 @@ Behavior("MATCH_RECORDING", async ({ associations, attachments, connections, rec
     const { recordIndividualMatches } = recordingOptions;
     const { division, fieldset } = attachments;
     const { obs, tm } = connections;
+
+    let sku: string | undefined = undefined;
+    const eventInfo = await fieldset.client.getEventInfo();
+    if (eventInfo.success) {
+        sku = eventInfo.data.code;
+    }
 
     let multipleDivisions = false;
     const divisions = await tm.getDivisions();
@@ -40,27 +46,37 @@ Behavior("MATCH_RECORDING", async ({ associations, attachments, connections, rec
         const { outputActive } = await obs.call("GetRecordStatus");
         if (outputActive) return;
 
-        let filename = [`${new Date().toISOString().replace(/:/g, "-")}`];
+        let filename = [new Date().toISOString().replaceAll(/:/g, "-")];
 
-        if (multipleDivisions) {
-            filename.push(`${division.name}`);
+        if (sku) {
+            filename.push(sku);
         }
 
-        const currentMatch = fieldset.state.match
+        if (multipleDivisions) {
+            filename.push(division.name.replaceAll("  ", ""));
+        }
+
+        const fieldsetMatch = fieldset.state.match;
+        const matchName = getMatchName(fieldsetMatch);
+        let match: Match | undefined = undefined;
 
         const matches = await division.getMatches();
         if (!matches.success) {
-            log("error", `Failed to fetch matches. ${matches.error}`);
+            log("error", `Failed to fetch matches.${matches.error} `);
         } else {
-            const match = matches.data.find(m => matchesEqual(m.matchInfo.matchTuple, getUnderlyingMatch(currentMatch)));
+            match = matches.data.find(m => matchesEqual(m.matchInfo.matchTuple, getUnderlyingMatch(fieldsetMatch)));
 
+            filename.push(matchName.replaceAll(" ", ""));
 
             for (const alliance of match?.matchInfo.alliances ?? []) {
-                filename.push(`${alliance.teams.map(t => t.number).join("_")}`);
+                filename.push(alliance.teams.map(t => t.number).join("_"));
             };
         };
 
-        await obs.call("SetProfileParameter", { parameterCategory: "Output", parameterName: "FilenameFormatting", parameterValue: filename.join("_") })
+        const parameterValue = filename.join("_");
+        log("info", `Match ${matchName} Video: ${parameterValue} `);
+
+        await obs.call("SetProfileParameter", { parameterCategory: "Output", parameterName: "FilenameFormatting", parameterValue });
         await obs.call("StartRecord");
     };
 

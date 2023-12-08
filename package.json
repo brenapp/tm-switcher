@@ -1,6 +1,6 @@
 {
   "name": "tm-switcher",
-  "version": "1.7.2",
+  "version": "1.8.0",
   "main": "src/main.ts",
   "bin": "out/switcher/main.js",
   "license": "MIT",

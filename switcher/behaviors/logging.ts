@@ -1,7 +1,7 @@
 import { Behavior } from "./index";
 import { log } from "../utils/logging";
 import { getMatchName, getUnderlyingMatch, matchesEqual } from "../utils/match";
-import type { MatchAlliance, MatchTuple } from "vex-tm-client/out/Match";
+import type { Match } from "vex-tm-client/out/Match";
 
 /**
  * Logging
@@ -37,21 +37,35 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
         const matchName = fieldset.state.match ? getMatchName(fieldset.state.match) : "Match";
         log("info", `[${timecode}] ${matchName} started on field ${fieldID} [OBS: ${association?.obs ?? "none"}, ATEM: ${association?.atem ?? "none"}]`);
 
-        let alliances: MatchAlliance[] = [];
+        let match: Match | undefined = undefined;
 
         const matches = await division.getMatches();
         if (!matches.success) {
             log("error", `Could not fetch matches from Tournament Manager: ${matches.error}`);
         } else {
-            const match = matches.data.find(m => matchesEqual(m.matchInfo.matchTuple, getUnderlyingMatch(fieldset.state.match)));
-            if (match) {
-                alliances = match.matchInfo.alliances;
-            }
+            match = matches.data.find(m => matchesEqual(m.matchInfo.matchTuple, getUnderlyingMatch(fieldset.state.match)));
         }
 
-        const teams = alliances.map(alliance => alliance.teams.map(team => team.number).join(" ")).join(" ");
-        timestamp.write(`${new Date().toISOString()},${timecode},${matchName},${teams}\n`);
+        const recordStatus = await obs?.call("GetRecordStatus");
+        const streamStatus = await obs?.call("GetStreamStatus");
 
+        const stat = await timestamp.stat();
+
+        if (stat.size < 1) {
+            timestamp.write("Timestamp,Recording Time,Stream Time,Scheduled Time,Match,Team 1,Team 2,Team 3,Team 4\n");
+        }
+
+        const teams = match?.matchInfo.alliances.map(alliance => alliance.teams.map(team => team.number)).flat() ?? [];
+        const scheduled = match ? new Date(match.matchInfo.timeScheduled * 1000).toISOString() : "";
+
+        timestamp.write([
+            new Date().toISOString(),
+            recordStatus?.outputTimecode ?? "00:00:00",
+            streamStatus?.outputTimecode ?? "00:00:00",
+            scheduled,
+            matchName,
+            ...teams
+        ].join(",") + "\n")
 
     });
 
@@ -80,7 +94,7 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
         const association = associations[fieldID];
 
         const matchName = getMatchName(fieldset.state.match);
-        log("info", `[${timecode}] info: ${matchName} assigned to field ${fieldID} [OBS: ${association?.obs ?? "none"}, ATEM: ${association?.atem ?? "none"}]`);
+        log("info", `[${timecode}] ${matchName} assigned to field ${fieldID} [OBS: ${association?.obs ?? "none"}, ATEM: ${association?.atem ?? "none"}]`);
     });
 
     fieldset.on("audienceDisplayChanged", async event => {

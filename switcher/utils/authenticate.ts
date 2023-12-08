@@ -27,9 +27,16 @@ export async function getTournamentManagerCredentials(): Promise<TMCredentials> 
     }
   ]);
 
-  const url = new URL(`http://${address}`);
+  try {
+    const url = new URL(`http://${address}`);
+    return { address: url.toString(), key };
+  } catch (e) {
+    log("error", `TM Address: ${e}`, `❌ Tournament Manager: ${e}`);
 
-  return { address: url.toString(), key };
+    await keypress();
+    process.exit(1);
+  }
+
 }
 
 export type OBSCredentials = {

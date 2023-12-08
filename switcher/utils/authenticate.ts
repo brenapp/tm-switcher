@@ -68,7 +68,7 @@ export async function getOBSCredentials(): Promise<OBSCredentials | null> {
     },
     {
       type: "password",
-      message: "OBS Websocket (leave blank for no password):",
+      message: "OBS Websocket Password:",
       mask: "*",
       name: "password",
     },

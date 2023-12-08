@@ -213,11 +213,6 @@ export async function getFileHandles(): Promise<FileHandles> {
     const timestampPath = join(directory, `tm_switcher_${date}_times.csv`);
 
     const timestamp = await fs.open(timestampPath, "a");
-    const stat = await timestamp.stat();
-
-    if (stat.size < 1) {
-        timestamp.write("TIMESTAMP,OBS_TIME,MATCH,TEAMS\n");
-    }
 
     const logPath = join(tmpdir(), `tm_switcher_${date}_log.txt`);
     const log = await fs.open(logPath, "a");

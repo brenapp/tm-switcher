@@ -26,7 +26,7 @@ Some key implementation details to be aware of when deploying this at your event
 
 - Make sure your LAN allows connections between devices! Typically, as an Event Partner, I will deploy our own router attached to the upstream network for our events. This is strongly recommended if you use tablet scoring or multiple computers in your tournament. Additionally, make sure that connections at the following ports are allowed between devices on your network: `80`, `4455`
 
-- ATEM control over USB is not supported due to a quirk in the control protocol. You will need to ensure that your switcher is connected to the network. Most ATEM switchers assign themselves static IPs (usually 192.168.10.240), so make sure that your router is able to assign that IP. Use the ATEM Setup utility over USB to connect
+- ATEM control over USB is not supported due to a quirk in the control protocol. You will need to ensure that your switcher is connected to the network. Most ATEM switchers assign themselves static IPs (usually 192.168.10.240), so make sure that your router is able to assign that IP. You can use the ATEM Setup utility over USB to connect to your switcher and determine what the network address of the device is.
 
 - DWAB's Third Party API requires that integrations have an internet connection. This means that the
   device running the switcher must have access to the internet. Currently, the tokens DWAB issues

@@ -36,6 +36,8 @@ Some key implementation details to be aware of when deploying this at your event
 
 - You will need to supply an API Key from Tournament Manager. This can be obtained from `Tools > Options > Web Publishing`.
 
+- When using Audience Display Automation, you likely want to select a relatively neutral scene transition effect, like a fade. Wipes or other lateral motion can interact poorly with how TM Switcher sequences audience display commands and scene changes. 
+
 If your event has trouble with this tool, please get in touch with me!
 
 ## Disclaimer

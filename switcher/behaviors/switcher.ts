@@ -27,7 +27,9 @@ Behavior("CORE_SWITCHER", async ({ associations, attachments, connections }) => 
 
     fieldset.on("fieldActivated", async match => {
         const { fieldID } = match;
-        await switchTo(fieldID);
+
+        // Timeout here to avoid switching before matchStopped results come up
+        setTimeout(() => switchTo(fieldID), 3000);
     });
 
 });

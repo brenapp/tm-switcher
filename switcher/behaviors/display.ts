@@ -9,10 +9,26 @@ Behavior("AUDIENCE_DISPLAY", async ({ attachments, audienceDisplayOptions }) => 
 
     const { fieldset } = attachments;
 
+
     fieldset.on("fieldActivated", async event => {
         if (audienceDisplayOptions.queueIntro) {
             log("info", "Field activated, showing intro");
-            await fieldset.setAudienceDisplay(FieldsetAudienceDisplay.Intro)
+
+            switch (fieldset.state.audienceDisplay) {
+
+                case FieldsetAudienceDisplay.Rankings:
+                case FieldsetAudienceDisplay.SavedMatchResults: {
+
+                    // Delay to account for switching program input when the new match is queued 
+                    setTimeout((() => fieldset.setAudienceDisplay(FieldsetAudienceDisplay.Intro)), 4000);
+                    break;
+                }
+
+                default: {
+                    await fieldset.setAudienceDisplay(FieldsetAudienceDisplay.Intro);
+                    break;
+                }
+            }
         }
     });
 
@@ -30,7 +46,5 @@ Behavior("AUDIENCE_DISPLAY", async ({ attachments, audienceDisplayOptions }) => 
             log("info", "Match ended, showing saved match results");
             await fieldset.setAudienceDisplay(FieldsetAudienceDisplay.SavedMatchResults);
         }
-
     });
-
-});
+});  

@@ -1,9 +1,10 @@
+import { FieldsetAudienceDisplay } from "vex-tm-client";
 import { Behavior } from "./index";
 
 /**
  * Core Switcher Behavior
  **/
-Behavior("CORE_SWITCHER", async ({ associations, attachments, connections }) => {
+Behavior("CORE_SWITCHER", async ({ associations, attachments, connections, audienceDisplayOptions }) => {
 
     const { fieldset } = attachments;
     const { obs, atem } = connections;
@@ -28,8 +29,17 @@ Behavior("CORE_SWITCHER", async ({ associations, attachments, connections }) => 
     fieldset.on("fieldActivated", async match => {
         const { fieldID } = match;
 
-        // Timeout here to avoid switching before matchStopped results come up
-        setTimeout(() => switchTo(fieldID), 3000);
+        const delaySwitch = (audienceDisplayOptions.savedScore || audienceDisplayOptions.flashRankings) && fieldset.state.audienceDisplay !== FieldsetAudienceDisplay.Intro;
+
+        // Delay switching modes here to not immediately switch away from saved score or rankings,
+        // if applicable
+        if (delaySwitch) {
+            setTimeout(() => switchTo(fieldID), 5000);
+        } else {
+            await switchTo(fieldID);
+        }
+
+
     });
 
 });

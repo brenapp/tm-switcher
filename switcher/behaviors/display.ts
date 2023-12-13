@@ -1,4 +1,4 @@
-import { FieldsetActiveMatchType, FieldsetAudienceDisplay } from "vex-tm-client";
+import { FieldsetActiveMatchType, FieldsetAudienceDisplay, MatchRound } from "vex-tm-client";
 import { Behavior } from "./index";
 import { log } from "../utils/logging";
 
@@ -20,7 +20,7 @@ Behavior("AUDIENCE_DISPLAY", async ({ attachments, audienceDisplayOptions }) => 
                 case FieldsetAudienceDisplay.SavedMatchResults: {
 
                     // Delay to account for switching program input when the new match is queued 
-                    setTimeout((() => fieldset.setAudienceDisplay(FieldsetAudienceDisplay.Intro)), 4000);
+                    setTimeout((() => fieldset.setAudienceDisplay(FieldsetAudienceDisplay.Intro)), 6000);
                     break;
                 }
 
@@ -39,12 +39,26 @@ Behavior("AUDIENCE_DISPLAY", async ({ attachments, audienceDisplayOptions }) => 
             return;
         }
 
-        if (audienceDisplayOptions.flashRankings && match.match.match % 6 === 0) {
-            log("info", "Match ended, showing rankings");
-            await fieldset.setAudienceDisplay(FieldsetAudienceDisplay.Rankings);
+        if (audienceDisplayOptions.flashRankings) {
+
+            let display: FieldsetAudienceDisplay | null = null;
+
+            if (match.match.round === MatchRound.Practice && match.match.match % 6 === 0) {
+                display = FieldsetAudienceDisplay.Schedule;
+            };
+
+            if (match.match.round === MatchRound.Qualification && match.match.match % 6 === 0) {
+                display = FieldsetAudienceDisplay.Rankings;
+            };
+
+            if (display) {
+                log("info", "Match ended, showing " + display);
+                setTimeout((() => fieldset.setAudienceDisplay(display!)), 2000);
+            }
+
         } else if (audienceDisplayOptions.savedScore) {
             log("info", "Match ended, showing saved match results");
-            await fieldset.setAudienceDisplay(FieldsetAudienceDisplay.SavedMatchResults);
+            setTimeout((() => fieldset.setAudienceDisplay(FieldsetAudienceDisplay.SavedMatchResults)), 2000);
         }
     });
 });  

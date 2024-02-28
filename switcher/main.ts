@@ -20,6 +20,7 @@ import "./behaviors/recording";
 import "./behaviors/switcher";
 import "./behaviors/logging";
 import "./behaviors/heartbeat";
+import "./behaviors/config";
 
 async function main() {
   console.log(`tm-switcher v${require("../../package.json").version}`);

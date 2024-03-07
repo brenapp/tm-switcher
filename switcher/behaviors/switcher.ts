@@ -4,7 +4,7 @@ import { Behavior } from "./index";
 /**
  * Core Switcher Behavior
  **/
-Behavior("CORE_SWITCHER", async ({ associations, attachments, connections, audienceDisplayOptions }) => {
+Behavior("CORE_SWITCHER", async ({ associations, attachments, connections, audienceDisplayOptions, displayAssociations }) => {
 
     const { fieldset } = attachments;
     const { obs, atem } = connections;
@@ -17,7 +17,7 @@ Behavior("CORE_SWITCHER", async ({ associations, attachments, connections, audie
         }
 
         if (atem && association?.atem) {
-            atem.changeProgramInput(association.atem);
+            await atem.changeProgramInput(association.atem);
         };
     }
 
@@ -38,8 +38,22 @@ Behavior("CORE_SWITCHER", async ({ associations, attachments, connections, audie
         } else {
             await switchTo(fieldID);
         }
-
-
     });
 
+    // Update OBS and ATEM Scene based on Audience Display Mode
+    fieldset.on("audienceDisplayChanged", async ({ display }) => {
+        const association = displayAssociations[display];
+
+        if (!association) {
+            return;
+        }
+
+        if (obs && association?.obs) {
+            await obs.call("SetCurrentProgramScene", { sceneName: association.obs });
+        }
+
+        if (atem && association?.atem) {
+            await atem.changeProgramInput(association.atem);
+        };
+    });
 });

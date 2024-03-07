@@ -149,8 +149,6 @@ export type DisplayAssociations = Record<FieldsetAudienceDisplay, Association | 
 const MODES = [
     FieldsetAudienceDisplay.Blank,
     FieldsetAudienceDisplay.Logo,
-    FieldsetAudienceDisplay.Intro,
-    FieldsetAudienceDisplay.InMatch,
     FieldsetAudienceDisplay.SavedMatchResults,
     FieldsetAudienceDisplay.Schedule,
     FieldsetAudienceDisplay.Rankings,
@@ -211,10 +209,12 @@ export async function getDisplayAssociations(obs: ObsWebSocket | null, atem: Ate
 
         const questions: DistinctQuestion[] = [];
         if (obsScenes.scenes.length > 1) {
+            const defaultValue = obsScenes.scenes.find(v => (v.sceneName as string).toLowerCase().includes(mode.toLowerCase()))
             questions.push({
                 type: "list",
                 name: "obs",
                 message: `${mode} OBS Scene? `,
+                default: defaultValue,
                 choices: [...obsScenes.scenes.map(s => s.sceneName as string), { name: "No Association", value: undefined }]
             })
         };

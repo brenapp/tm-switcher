@@ -8,6 +8,7 @@ import {
 import {
   getAssociations,
   getAudienceDisplayOptions,
+  getDisplayAssociations,
   getFileHandles,
   getRecordingOptions,
   getTournamentAttachments
@@ -56,6 +57,7 @@ async function main() {
   // Configuration
   const attachments = await getTournamentAttachments(tm);
   const associations = await getAssociations(attachments.fieldset, obs, atem);
+  const displayAssociations = await getDisplayAssociations(obs, atem);
 
   console.log("");
 
@@ -70,6 +72,7 @@ async function main() {
       attachments,
       audienceDisplayOptions,
       associations,
+      displayAssociations,
       recordingOptions,
       connections: { tm, obs, atem },
       handles,

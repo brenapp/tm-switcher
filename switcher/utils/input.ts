@@ -1,6 +1,6 @@
-import inquirer, { DistinctQuestion, QuestionCollection } from "inquirer";
+import inquirer, { DistinctQuestion } from "inquirer";
 import ObsWebSocket from "obs-websocket-js";
-import { Client, Division, Fieldset } from "vex-tm-client";
+import { Client, Division, Fieldset, FieldsetAudienceDisplay } from "vex-tm-client";
 import { join } from "path";
 import { promises as fs } from "fs";
 import { cwd } from "process";
@@ -83,12 +83,12 @@ export async function getTournamentAttachments(tm: Client): Promise<TournamentAt
     }
 };
 
-export type FieldAssociation = {
+export type Association = {
     obs: string | undefined,
     atem: number | undefined
 }
 
-export type FieldAssociations = Record<string, FieldAssociation | undefined>;
+export type FieldAssociations = Record<string, Association | undefined>;
 
 export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket | null, atem: Atem | null): Promise<FieldAssociations> {
     const fields = await fieldset.getFields();
@@ -107,7 +107,7 @@ export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket | nu
 
     for (const field of fields.data) {
         const questions: DistinctQuestion[] = [];
-        const initial: FieldAssociation = { obs: undefined, atem: undefined };
+        const initial: Association = { obs: undefined, atem: undefined };
 
         if (obs && scenes.scenes.length > 0) {
             const defaultValue = scenes.scenes.find(s => `${s.sceneName}`.toLowerCase() === field.name.toLowerCase())?.sceneName as string | undefined;
@@ -137,12 +137,104 @@ export async function getAssociations(fieldset: Fieldset, obs: ObsWebSocket | nu
             );
         }
 
-        const response = await inquirer.prompt<FieldAssociation>(questions);
+        const response = await inquirer.prompt<Association>(questions);
         associations[field.id] = response;
     };
 
     return associations;
 };
+
+export type DisplayAssociations = Record<FieldsetAudienceDisplay, Association | undefined>
+
+const MODES = [
+    FieldsetAudienceDisplay.Blank,
+    FieldsetAudienceDisplay.Logo,
+    FieldsetAudienceDisplay.Intro,
+    FieldsetAudienceDisplay.InMatch,
+    FieldsetAudienceDisplay.SavedMatchResults,
+    FieldsetAudienceDisplay.Schedule,
+    FieldsetAudienceDisplay.Rankings,
+    FieldsetAudienceDisplay.SkillsRankings,
+    FieldsetAudienceDisplay.AllianceSelection,
+    FieldsetAudienceDisplay.ElimBracket,
+    FieldsetAudienceDisplay.Slides,
+    FieldsetAudienceDisplay.Inspection
+]
+
+export async function getDisplayAssociations(obs: ObsWebSocket | null, atem: Atem | null): Promise<DisplayAssociations> {
+
+    const associations: DisplayAssociations = {
+        [FieldsetAudienceDisplay.Blank]: undefined,
+        [FieldsetAudienceDisplay.Logo]: undefined,
+        [FieldsetAudienceDisplay.Intro]: undefined,
+        [FieldsetAudienceDisplay.InMatch]: undefined,
+        [FieldsetAudienceDisplay.SavedMatchResults]: undefined,
+        [FieldsetAudienceDisplay.Schedule]: undefined,
+        [FieldsetAudienceDisplay.Rankings]: undefined,
+        [FieldsetAudienceDisplay.SkillsRankings]: undefined,
+        [FieldsetAudienceDisplay.AllianceSelection]: undefined,
+        [FieldsetAudienceDisplay.ElimBracket]: undefined,
+        [FieldsetAudienceDisplay.Slides]: undefined,
+        [FieldsetAudienceDisplay.Inspection]: undefined
+    }
+
+    const obsScenes = await obs?.call("GetSceneList") ?? { scenes: [] };
+    const atemInputs = Object.entries(atem?.state?.inputs ?? {});
+
+    if (obsScenes.scenes.length < 2 && atemInputs.length < 2) {
+        return associations;
+    }
+
+    const { associated_scene } = await inquirer.prompt({
+        name: "associated_scene",
+        type: "confirm",
+        message: "Associate Display Modes? ",
+        default: false
+    });
+
+    if (!associated_scene) {
+        return associations;
+    }
+
+    for (const mode of MODES) {
+
+        const { associate } = await inquirer.prompt({
+            name: "associate",
+            type: "confirm",
+            message: `Switch on ${mode}? `,
+            default: false,
+        })
+
+        if (!associate) {
+            continue;
+        }
+
+        const questions: DistinctQuestion[] = [];
+        if (obsScenes.scenes.length > 1) {
+            questions.push({
+                type: "list",
+                name: "obs",
+                message: `${mode} OBS Scene? `,
+                choices: [...obsScenes.scenes.map(s => s.sceneName as string), { name: "No Association", value: undefined }]
+            })
+        };
+
+        if (atemInputs.length > 1) {
+            questions.push({
+                type: "list",
+                name: "atem",
+                message: `${mode} ATEM Input? `,
+                choices: [...atemInputs.map(([value, input]) => ({ name: input?.shortName, value: Number.parseInt(value) })), { name: "No Association", value: undefined }],
+            })
+        }
+
+        associations[mode] = await inquirer.prompt(questions) as Association;
+
+    };
+
+    return associations;
+};
+
 
 export type RecordingOptions = {
     recordIndividualMatches: boolean,

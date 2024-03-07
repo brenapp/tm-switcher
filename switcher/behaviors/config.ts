@@ -1,4 +1,4 @@
-import { Behavior, SwitcherBehavior } from "behaviors";
+import { Behavior, SwitcherBehavior } from "./index";
 import { homedir } from "os";
 import { join } from "path";
 import { readFile, writeFile } from "fs/promises";

@@ -1,9 +1,8 @@
-
 import {
   getCredentials,
   connectTM,
   connectOBS,
-  connectATEM
+  connectATEM,
 } from "./utils/authenticate";
 import {
   getAssociations,
@@ -11,9 +10,10 @@ import {
   getDisplayAssociations,
   getFileHandles,
   getRecordingOptions,
-  getTournamentAttachments
+  getTournamentAttachments,
 } from "./utils/input";
 import { log, setLogFile } from "./utils/logging";
+import { promptForUpdate } from "./utils/update";
 import { BEHAVIORS } from "./behaviors";
 
 import "./behaviors/display";
@@ -24,7 +24,10 @@ import "./behaviors/heartbeat";
 
 async function main() {
   console.log(`tm-switcher v${require("../../package.json").version}`);
-  console.log("Created by Brendan McGuire (brendan@bren.app)\n");
+  console.log("Created by Brendan McGuire (brendan@bren.app)");
+
+  await promptForUpdate();
+  console.log("");
 
   // Logging
   const handles = await getFileHandles();
@@ -76,10 +79,9 @@ async function main() {
       recordingOptions,
       connections: { tm, obs, atem },
       handles,
-      credentials: creds
+      credentials: creds,
     });
   }
 }
-
 
 main();

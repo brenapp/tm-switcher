@@ -11,6 +11,7 @@
     "rb": "npm run bundle && ./bundle/tm-switcher-macos"
   },
   "dependencies": {
+    "@octokit/types": "^13.5.0",
     "@types/inquirer": "^7.3.1",
     "atem-connection": "^3.0.1",
     "inquirer": "^7.3.3",

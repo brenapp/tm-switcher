@@ -23,8 +23,11 @@ import "./behaviors/logging";
 import "./behaviors/heartbeat";
 
 async function main() {
-  console.log(`tm-switcher v${require("../../package.json").version}`);
-  console.log("Created by Brendan McGuire (brendan@bren.app)");
+  console.log(
+    `TM Switcher v${
+      require("../../package.json").version
+    } - Created by Brendan McGuire (brendan@bren.app)`
+  );
 
   await promptForUpdate();
   console.log("");

@@ -1,4 +1,5 @@
 import { Endpoints } from "@octokit/types";
+import chalk from "chalk";
 
 export type ListReleasesResponse =
   Endpoints["GET /repos/{owner}/{repo}/releases"]["response"]["data"];
@@ -79,7 +80,9 @@ export async function promptForUpdate() {
 
   if (compareVersion(current, newest) > 0) {
     console.log(
-      `↳ Update Available! Download ${release.tag_name} from ${release.html_url}`
+      ` ↳ ${chalk.green("Update Available!")} Download ${chalk.magenta(
+        release.tag_name
+      )} from ${chalk.underline(chalk.blueBright(release.html_url))}`
     );
   }
 }

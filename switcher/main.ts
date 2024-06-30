@@ -8,7 +8,7 @@ import {
   getAssociations,
   getAudienceDisplayOptions,
   getDisplayAssociations,
-  getFileHandles,
+  initFileHandles,
   getRecordingOptions,
   getTournamentAttachments,
 } from "./utils/input";
@@ -33,7 +33,7 @@ async function main() {
   console.log("");
 
   // Logging
-  const handles = await getFileHandles();
+  const handles = await initFileHandles();
   setLogFile(handles.log);
 
   console.log(`Log File: ${handles.logPath}`);

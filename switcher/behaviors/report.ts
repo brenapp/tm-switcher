@@ -27,32 +27,42 @@ export async function reportIssue(
     {
       name: "email",
       type: "input",
-      message: "Email? ",
+      message: "Email?",
     },
     {
       name: "comment",
       type: "input",
-      message: "Comment? ",
+      message: "Comment?",
     },
   ]);
 
   const frontmatter = [
-    `Email: ${email}`,
-    `Comment: ${comment}`,
-    `Version: ${require("../../../package.json").version}`,
-    `Date: ${new Date().toISOString()}`,
-    `System: Platform=${os.platform()} Machine=${os.machine()} Version=${os.version()} Release=${os.release()}}`,
-  ].join("\n");
+    [`Email`, email],
+    [`Comment`, comment],
+    [`Version`, require("../../../package.json").version],
+    [`Date`, new Date().toISOString()],
+    [
+      `System`,
+      `Platform=${os.platform()} Machine=${os.machine()} Version=${os.version()} Release=${os.release()}`,
+    ],
+  ];
 
   const { logPath } = await getFileHandles();
   const logs = await readFile(logPath);
 
-  const body = [frontmatter, context, logs].join("\n\n--\n\n");
+  const body = [
+    frontmatter.map((e) => `${e[0]}: ${e[1]}`).join("\n"),
+    context,
+    logs,
+  ].join("\n\n--\n\n");
 
   const response = await fetch(DUMP_ENDPOINT, {
     method: "PUT",
     headers: {
       Authorization: `Bearer ${token}`,
+      "X-Log-Server-Frontmatter": JSON.stringify(
+        Object.fromEntries(frontmatter)
+      ),
     },
     body,
   });
@@ -65,7 +75,7 @@ export async function promptReportIssue(context: string) {
   const { shouldReport } = await inquirer.prompt({
     name: "shouldReport",
     type: "confirm",
-    message: "Report Issue? ",
+    message: "Report Issue?",
   });
 
   if (!shouldReport) {

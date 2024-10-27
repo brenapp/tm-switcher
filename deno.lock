@@ -1,0 +1,27 @@
+{
+  "version": "4",
+  "specifiers": {
+    "jsr:@std/dotenv@*": "0.225.2"
+  },
+  "jsr": {
+    "@std/dotenv@0.225.2": {
+      "integrity": "e2025dce4de6c7bca21dece8baddd4262b09d5187217e231b033e088e0c4dd23"
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@octokit/types@^13.5.0",
+        "npm:@types/inquirer@^7.3.1",
+        "npm:@types/node@^20.9.4",
+        "npm:atem-connection@^3.0.1",
+        "npm:chalk@^4.1.2",
+        "npm:inquirer@^7.3.3",
+        "npm:obs-websocket-js@^5.0.1",
+        "npm:pkg@^5.8.1",
+        "npm:typescript@^4.8.3",
+        "npm:vex-tm-client@^1.4.0"
+      ]
+    }
+  }
+}

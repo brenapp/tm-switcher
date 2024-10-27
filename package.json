@@ -2,15 +2,8 @@
   "name": "tm-switcher",
   "version": "1.9.0",
   "main": "src/main.ts",
-  "bin": "out/switcher/main.js",
   "type": "module",
   "license": "MIT",
-  "scripts": {
-    "build": "tsc",
-    "bundle": "npm run build && rm -rf bundle && pkg package.json --options no-warnings",
-    "run": "rm -rf out && tsc && node out/switcher/main.js",
-    "rb": "npm run bundle && ./bundle/tm-switcher-macos"
-  },
   "dependencies": {
     "@octokit/types": "^13.5.0",
     "@types/inquirer": "^7.3.1",

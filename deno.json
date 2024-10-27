@@ -1,11 +1,11 @@
 {
   "tasks": {
     "switcher:dev": "deno run --allow-all --watch switcher/main.ts",
-    "switcher:compile:x86_64-pc-windows-msvc": "deno compile --allow-all --env --frozen --output ./bundle/tm-switcher-x86_64-pc-windows-msvc --target=x86_64-pc-windows-msvc switcher/main.ts",
-    "switcher:x86_64-apple-darwin": "deno compile --allow-all --env --frozen --output ./bundle/tm-switcher-x86_64-apple-darwin --target=x86_64-apple-darwin switcher/main.ts",
-    "switcher:aarch64-apple-darwin": "deno compile --allow-all --env --frozen --output ./bundle/tm-switcher-aarch64-apple-darwin --target=aarch64-apple-darwin switcher/main.ts",
-    "switcher:x86_64-unknown-linux-gnu": "deno compile --allow-all --env --frozen --output ./bundle/tm-switcher-x86_64-unknown-linux-gnu --target=x86_64-unknown-linux-gnu switcher/main.ts",
-    "switcher:aarch64-unknown-linux-gnu": "deno compile --allow-all --env --frozen --output ./bundle/tm-switcher-aarch64-unknown-linux-gnu --target=aarch64-unknown-linux-gnu switcher/main.ts",
+    "switcher:compile:x86_64-pc-windows-msvc": "deno compile --allow-all --env --frozen --include node_modules/@julusian/freetype2/prebuilds/**/* --output ./bundle/tm-switcher-x86_64-pc-windows-msvc --target=x86_64-pc-windows-msvc switcher/main.ts",
+    "switcher:compile:x86_64-apple-darwin": "deno compile --allow-all --env --frozen --include node_modules/@julusian/freetype2/prebuilds/**/* --output ./bundle/tm-switcher-x86_64-apple-darwin --target=x86_64-apple-darwin switcher/main.ts",
+    "switcher:compile:aarch64-apple-darwin": "deno compile --allow-all --env --frozen --include node_modules/@julusian/freetype2/prebuilds/**/* --output ./bundle/tm-switcher-aarch64-apple-darwin --target=aarch64-apple-darwin switcher/main.ts",
+    "switcher:compile:x86_64-unknown-linux-gnu": "deno compile --allow-all --env --frozen --include node_modules/@julusian/freetype2/prebuilds/**/* --output ./bundle/tm-switcher-x86_64-unknown-linux-gnu --target=x86_64-unknown-linux-gnu switcher/main.ts",
+    "switcher:compile:aarch64-unknown-linux-gnu": "deno compile --allow-all --env --frozen --include node_modules/@julusian/freetype2/prebuilds/**/* --output ./bundle/tm-switcher-aarch64-unknown-linux-gnu --target=aarch64-unknown-linux-gnu switcher/main.ts",
     "host:dev": "cd host && npx tauri dev",
     "host:build": "cd host && npx tauri build"
   }

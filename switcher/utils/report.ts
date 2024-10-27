@@ -6,7 +6,7 @@ import { keypress } from "./authenticate.ts";
 import { env } from "./env.ts";
 import process from "node:process";
 
-const DUMP_ENDPOINT = new URL("", env.LOG_SERVER);
+const DUMP_ENDPOINT = new URL("/dump", env.LOG_SERVER);
 
 export type IssueReportMetadata = {
   email: string;

@@ -16,19 +16,17 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": [
-      "binaries/tm-switcher"
-    ]
+    "externalBin": ["../../bundle/tm-switcher"]
   },
-  "productName": "host",
+  "productName": "TM Switcher",
   "version": "0.1.0",
-  "identifier": "app.bren.host",
+  "identifier": "app.bren.tmswitcher",
   "plugins": {},
   "app": {
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "Host",
+        "title": "TM Switcher",
         "width": 800,
         "height": 600
       }

@@ -1,12 +1,12 @@
 import process from "node:process";
 import { FieldsetActiveMatchType, Match } from "vex-tm-client";
-import { type Behavior } from "./index.ts";
-import { log } from "../utils/logging.ts";
+import { type Behavior } from "./index.js";
+import { log } from "../utils/logging.js";
 import {
   getMatchName,
   getUnderlyingMatch,
   matchesEqual,
-} from "../utils/match.ts";
+} from "../utils/match.js";
 
 export const RecordingBehavior: Behavior = async ({
   attachments,

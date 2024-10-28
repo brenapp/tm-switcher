@@ -1,6 +1,6 @@
-import { type Behavior } from "./index.ts";
+import { type Behavior } from "./index.js";
 import process from "node:process";
-import { log } from "../utils/logging.ts";
+import { log } from "../utils/logging.js";
 
 export const HeartbeatBehavior: Behavior = ({
   attachments,
@@ -10,8 +10,8 @@ export const HeartbeatBehavior: Behavior = ({
   const { tm, obs } = connections;
   const { fieldset } = attachments;
 
-  let tmTimeout: number | null = null;
-  let obsTimeout: number | null = null;
+  let tmTimeout: NodeJS.Timeout | null = null;
+  let obsTimeout: NodeJS.Timeout | null = null;
 
   async function tmHeartbeat(reconnect = false) {
     const divisions = await tm.getDivisions();

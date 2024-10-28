@@ -2,10 +2,10 @@ import inquirer from "inquirer";
 import { Client } from "vex-tm-client";
 import OBSWebSocket from "obs-websocket-js";
 import { Atem } from "atem-connection";
-import { log } from "./logging.ts";
+import { log } from "./logging.js";
 import process from "node:process";
-import { promptReportIssue } from "./report.ts";
-import { env } from "./env.ts";
+import { promptReportIssue } from "./report.js";
+import { env } from "./env.js";
 
 export type TMCredentials = {
   address: string;

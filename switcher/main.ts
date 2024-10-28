@@ -3,7 +3,7 @@ import {
   connectOBS,
   connectTM,
   getCredentials,
-} from "./utils/authenticate.ts";
+} from "./utils/authenticate.js";
 import {
   getAssociations,
   getAudienceDisplayOptions,
@@ -11,16 +11,16 @@ import {
   getRecordingOptions,
   getTournamentAttachments,
   initFileHandles,
-} from "./utils/input.ts";
-import { log, setLogFile } from "./utils/logging.ts";
-import { promptForUpdate } from "./utils/update.ts";
+} from "./utils/input.js";
+import { log, setLogFile } from "./utils/logging.js";
+import { promptForUpdate } from "./utils/update.js";
 
-import { AudienceDisplayBehavior } from "./behaviors/display.ts";
-import { RecordingBehavior } from "./behaviors/recording.ts";
-import { CoreSwitcherBehavior } from "./behaviors/switcher.ts";
-import { LoggingBehavior } from "./behaviors/logging.ts";
-import { HeartbeatBehavior } from "./behaviors/heartbeat.ts";
-import { env } from "./utils/env.ts";
+import { AudienceDisplayBehavior } from "./behaviors/display.js";
+import { RecordingBehavior } from "./behaviors/recording.js";
+import { CoreSwitcherBehavior } from "./behaviors/switcher.js";
+import { LoggingBehavior } from "./behaviors/logging.js";
+import { HeartbeatBehavior } from "./behaviors/heartbeat.js";
+import { env } from "./utils/env.js";
 
 const BEHAVIORS = {
   AudienceDisplayBehavior,

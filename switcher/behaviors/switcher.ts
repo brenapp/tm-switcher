@@ -1,4 +1,4 @@
-import { type Behavior } from "./index.ts";
+import { type Behavior } from "./index.js";
 import { FieldsetAudienceDisplay } from "vex-tm-client";
 
 export const CoreSwitcherBehavior: Behavior = ({

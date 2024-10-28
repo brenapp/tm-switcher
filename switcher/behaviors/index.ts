@@ -1,6 +1,6 @@
 import { Atem } from "atem-connection";
 import OBSWebSocket from "obs-websocket-js";
-import { Credentials } from "../utils/authenticate.ts";
+import { Credentials } from "../utils/authenticate.js";
 import {
   AudienceDisplayOptions,
   DisplayAssociations,
@@ -8,7 +8,7 @@ import {
   FileHandles,
   RecordingOptions,
   TournamentAttachments,
-} from "../utils/input.ts";
+} from "../utils/input.js";
 import { Client } from "vex-tm-client";
 
 export type SwitcherBehavior = {

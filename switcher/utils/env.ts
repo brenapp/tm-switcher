@@ -1,5 +1,5 @@
-import "jsr:@std/dotenv/load";
 import process from "node:process";
+import "dotenv/config";
 
 export const env = {
   LOG_SERVER: process.env.LOG_SERVER!,

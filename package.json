@@ -4,17 +4,39 @@
   "main": "src/main.ts",
   "type": "module",
   "license": "MIT",
+  "bin": "./out/switcher/main.js",
+  "scripts": {
+    "host:build": "cd host && npm run tauri build",
+    "switcher:build": "tsc"
+  },
+  "pkg": {
+    "assets": [
+      "node_modules/@julusian/freetype2/prebuilds/**/*",
+      "secret/**/*"
+    ],
+    "targets": [
+      "latest-macos-x64",
+      "latest-win-x64",
+      "latest-linux-x64"
+    ],
+    "outputPath": "bundle"
+  },
+  "workspaces": [
+    "host"
+  ],
   "dependencies": {
     "@octokit/types": "^13.5.0",
     "@types/inquirer": "^7.3.1",
     "atem-connection": "^3.0.1",
     "chalk": "^4.1.2",
+    "dotenv": "^16.4.5",
     "inquirer": "^7.3.3",
     "obs-websocket-js": "^5.0.1",
     "vex-tm-client": "^1.4.0"
   },
   "devDependencies": {
     "@types/node": "^20.9.4",
+    "@yao-pkg/pkg": "^6.0.0",
     "pkg": "^5.8.1",
     "typescript": "^4.8.3"
   }

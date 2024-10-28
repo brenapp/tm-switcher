@@ -12,10 +12,10 @@ import {
   Fieldset,
   FieldsetAudienceDisplay,
 } from "vex-tm-client";
-import { keypress } from "./authenticate.ts";
-import { log } from "./logging.ts";
-import { promptReportIssue } from "./report.ts";
-import { env } from "./env.ts";
+import { keypress } from "./authenticate.js";
+import { log } from "./logging.js";
+import { promptReportIssue } from "./report.js";
+import { env } from "./env.js";
 
 export type TournamentAttachments = {
   fieldset: Fieldset;

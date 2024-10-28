@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import { env } from "./env.ts";
-import type { Endpoints } from "@octokit/types/dist-types/generated/Endpoints.ts";
+import { env } from "./env.js";
+import type { Endpoints } from "@octokit/types/dist-types/generated/Endpoints.js";
 
 export type ListReleasesResponse =
   Endpoints["GET /repos/{owner}/{repo}/releases"]["response"]["data"];

@@ -3,8 +3,8 @@ import {
   FieldsetAudienceDisplay,
   MatchRound,
 } from "vex-tm-client";
-import type { Behavior } from "./index.ts";
-import { log } from "../utils/logging.ts";
+import type { Behavior } from "./index.js";
+import { log } from "../utils/logging.js";
 
 export const AudienceDisplayBehavior: Behavior = ({
   attachments,

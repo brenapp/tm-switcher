@@ -1,9 +1,9 @@
 import { readFile } from "node:fs/promises";
 import * as os from "node:os";
 import inquirer from "inquirer";
-import { getFileHandles } from "./input.ts";
-import { keypress } from "./authenticate.ts";
-import { env } from "./env.ts";
+import { getFileHandles } from "./input.js";
+import { keypress } from "./authenticate.js";
+import { env } from "./env.js";
 import process from "node:process";
 
 const DUMP_ENDPOINT = new URL("/dump", env.LOG_SERVER);

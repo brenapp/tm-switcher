@@ -3,8 +3,8 @@ name: Build
 
 on:
   push:
-    branches:
-      - "*"
+    branches-ignore:
+      - master
 
 jobs:
   build-switcher:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v1
         with:
-          node-version: lts/*
+          node-version: "22.x"
       - name: Install dependencies
         run: npm install
       - name: Build

@@ -1,5 +1,9 @@
 import process from "node:process";
-import "dotenv/config";
+import { config } from "dotenv";
+import { join } from "node:path";
+
+// Dirty hack to make sure pkg includes the .env file
+config({ path: join(__dirname, "../../../.env") });
 
 export const env = {
   LOG_SERVER: process.env.LOG_SERVER!,

@@ -23,7 +23,7 @@
   "identifier": "app.bren.tmswitcher",
   "plugins": {},
   "app": {
-    "withGlobalTauri": true,
+    "withGlobalTauri": false,
     "windows": [
       {
         "title": "TM Switcher",

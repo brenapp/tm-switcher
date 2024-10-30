@@ -2,28 +2,29 @@
   "name": "tm-switcher",
   "version": "1.9.0",
   "main": "src/main.ts",
-  "type": "module",
   "license": "MIT",
   "bin": "./out/switcher/main.js",
   "scripts": {
     "host:build": "cd host && npm run tauri build",
-    "switcher:build": "tsc"
+    "host:dev": "cd host && npm run tauri dev",
+    "switcher:build": "tsc",
+    "switcher:compile": "pkg package.json --options no-warnings",
+    "switcher:run": "node out/switcher/main.js"
   },
   "pkg": {
     "assets": [
       "node_modules/@julusian/freetype2/prebuilds/**/*",
-      "secret/**/*"
+      ".env"
     ],
     "targets": [
-      "latest-macos-x64",
       "latest-win-x64",
-      "latest-linux-x64"
+      "latest-linux-x64",
+      "latest-linux-arm64",
+      "latest-macos-arm64",
+      "latest-macos-x64"
     ],
     "outputPath": "bundle"
   },
-  "workspaces": [
-    "host"
-  ],
   "dependencies": {
     "@octokit/types": "^13.5.0",
     "@types/inquirer": "^7.3.1",
@@ -35,9 +36,14 @@
     "vex-tm-client": "^1.4.0"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.1",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^15.3.0",
+    "@rollup/plugin-typescript": "^12.1.1",
     "@types/node": "^20.9.4",
     "@yao-pkg/pkg": "^6.0.0",
     "pkg": "^5.8.1",
+    "rollup-plugin-terser": "^7.0.2",
     "typescript": "^4.8.3"
   }
 }

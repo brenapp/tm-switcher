@@ -40,9 +40,6 @@ jobs:
             args: ""
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Install Dependencies (host)
-        working-directory: host
-        run: npm install
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:

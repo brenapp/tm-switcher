@@ -4,33 +4,37 @@ import { FitAddon } from "@xterm/addon-fit";
 import { ITheme, Terminal } from "@xterm/xterm";
 import colors from "tailwindcss/colors";
 
+import "@xterm/xterm/css/xterm.css";
+
 export const theme: ITheme = {
-  "background": colors.zinc["900"],
-  "foreground": colors.zinc["50"],
-  "black": colors.zinc["900"],
-  "brightBlack": colors.zinc["950"],
-  "white": colors.zinc["50"],
-  "brightBlue": colors.blue["300"],
-  "brightCyan": colors.cyan["300"],
-  "brightGreen": colors.emerald["300"],
-  "brightMagenta": colors.fuchsia["300"],
-  "brightRed": colors.red["300"],
-  "brightWhite": colors.zinc["50"],
-  "brightYellow": colors.yellow["300"],
-  "blue": colors.blue["400"],
-  "cyan": colors.cyan["400"],
-  "green": colors.green["400"],
-  "magenta": colors.fuchsia["400"],
-  "red": colors.red["400"],
-  "yellow": colors.yellow["400"],
+  background: colors.zinc["900"],
+  foreground: colors.zinc["50"],
+  black: colors.zinc["900"],
+  brightBlack: colors.zinc["950"],
+  white: colors.zinc["50"],
+  brightBlue: colors.blue["300"],
+  brightCyan: colors.cyan["300"],
+  brightGreen: colors.emerald["300"],
+  brightMagenta: colors.fuchsia["300"],
+  brightRed: colors.red["300"],
+  brightWhite: colors.zinc["50"],
+  brightYellow: colors.yellow["300"],
+  blue: colors.blue["400"],
+  cyan: colors.cyan["400"],
+  green: colors.green["400"],
+  magenta: colors.fuchsia["400"],
+  red: colors.red["400"],
+  yellow: colors.yellow["400"],
 };
 
-type ProcessEvent = {
-  event: "output";
-  data: number[];
-} | {
-  event: "terminated";
-};
+type ProcessEvent =
+  | {
+      event: "output";
+      data: number[];
+    }
+  | {
+      event: "terminated";
+    };
 
 async function createTTY() {
   const terminal = new Terminal({

@@ -16,7 +16,10 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "22.x"
-      - name: Install dependencies
-        run: npm install
+      - name: Install Switcher dependencies
+        run: npm ci
+      - name: Install Host dependencies
+        run: npm ci
+        working-directory: ./host
       - name: Build
         run: npm run switcher:build

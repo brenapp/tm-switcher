@@ -23,6 +23,7 @@ jobs:
       - name: Build Switcher
         run: sh ./scripts/compile_switcher.sh
   publish:
+    needs: build-switcher
     permissions:
       contents: write
     strategy:

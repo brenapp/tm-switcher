@@ -6,3 +6,4 @@ secret
 
 *.csv
 .env
+.env.old

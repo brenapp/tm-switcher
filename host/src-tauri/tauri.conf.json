@@ -16,10 +16,12 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": ["../../bundle/tm-switcher"]
+    "externalBin": [
+      "../../bundle/tm-switcher"
+    ]
   },
   "productName": "TM Switcher",
-  "version": "0.1.0",
+  "version": "2.0.0",
   "identifier": "app.bren.tmswitcher",
   "plugins": {},
   "app": {

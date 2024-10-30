@@ -29,9 +29,14 @@ pub struct ProcessOptions {
 
 impl Process {
     // Create a new process
-    pub fn new(command: CommandBuilder, options: ProcessOptions) -> Result<Self> {
+    pub fn new(mut command: CommandBuilder, options: ProcessOptions) -> Result<Self> {
         let pty_system = native_pty_system();
         let pair = pty_system.openpty(options.size)?;
+
+        // Environment Variable Overrides
+        command.env("TERM", "xterm-256color");
+        command.env("COLORTERM", "truecolor");
+        command.env("TERM_PROGRAM", "host");
 
         let _ = pair.slave.spawn_command(command)?;
 
@@ -56,10 +61,7 @@ impl Process {
 
         let writer = pair.master.take_writer()?;
 
-        Ok(Self {
-            pty: pair,
-            writer,
-        })
+        Ok(Self { pty: pair, writer })
     }
 
     pub fn resize(&self, size: PtySize) -> Result<()> {

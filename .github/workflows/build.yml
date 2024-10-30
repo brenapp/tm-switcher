@@ -21,10 +21,8 @@ jobs:
       - name: Install Host dependencies
         run: npm ci
         working-directory: ./host
-      - name: Directory Structure
-        run: find ./ -type d
-      - name: Build
-        run: npm run switcher:build
+      - name: Build Switcher
+        run: sh ./scripts/compile_switcher.sh
   build-host:
     needs: build-switcher
     permissions:

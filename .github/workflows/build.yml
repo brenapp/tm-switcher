@@ -24,6 +24,7 @@ jobs:
       - name: Build
         run: npm run switcher:build
   build-host:
+    needs: build-switcher
     permissions:
       contents: write
     strategy:
@@ -51,4 +52,5 @@ jobs:
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
       - uses: tauri-apps/tauri-action@v0
         with:
+          projectPath: ./host
           args: ${{ matrix.args }}

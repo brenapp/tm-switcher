@@ -61,4 +61,5 @@ jobs:
           releaseBody: "This build was created automatically as a release canddiate."
           releaseDraft: true
           prerelease: true
+          projectPath: ./host
           args: ${{ matrix.args }}

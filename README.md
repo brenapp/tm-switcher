@@ -40,6 +40,9 @@ Some key implementation details to be aware of when deploying this at your event
 
 If your event has trouble with this tool, please get in touch with me!
 
+
 ## Disclaimer
 
 This software is not officially supported by DWAB, VEX Robotics, or the REC Foundation. Event Partners utilizing TM Switcher are doing so at their own risk. This software is licensed under the MIT License, which permits commercial and non-commercial uses. The author disclaims all liability for running this software at your events.
+
+> If you are interested in premium onsite support for TM Switcher or escalated development to support features for your event, please reach out at events@bren.app

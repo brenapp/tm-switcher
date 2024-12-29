@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/brenapp/tm-switcher/refs/heads/master/schemas/config.json",
+  "title": "TM Switcher Configuration",
+  "description": "Configuration for TM Switcher.",
+  "type": "object",
+  "properties": {
+    "attachments": {
+      "type": "object",
+      "properties": {
+        "division": {
+          "type": "string",
+          "description": "The division to connect to."
+        },
+        "fieldset": {
+          "type": "string",
+          "description": "The fieldset to connect to."
+        }
+      }
+    },
+    "audienceDisplayOptions": {
+      "type": "object",
+      "properties": {
+        "queueIntro": {
+          "type": "boolean",
+          "description": "Show intro upon field activation."
+        },
+        "savedScore": {
+          "type": "boolean",
+          "description": "Show saved score after match"
+        },
+        "flashRankings": {
+          "type": "boolean",
+          "description": "Show rankings after every 6th match"
+        }
+      }
+    },
+    "associations": {
+      "type": "object",
+      "description": "Record of field associations",
+      "additionalProperties": {
+        "$ref": "#/$defs/association"
+      }
+    },
+    "displayAssociations": {
+      "type": "object",
+      "description": "Map of fieldsetAudienceDisplay to associations",
+      "additionalProperties": {
+        "$ref": "#/$defs/association"
+      },
+      "propertyNames": {
+        "$ref": "#/$defs/fieldsetAudienceDisplay"
+      }
+    },
+    "recordingOptions": {
+      "type": "object",
+      "properties": {
+        "recordIndividualMatches": {
+          "type": "boolean",
+          "description": "Start and stop recording for each match."
+        }
+      }
+    }
+  },
+  "required": [
+    "attachments",
+    "audienceDisplayOptions",
+    "associations",
+    "displayAssociations",
+    "recordingOptions"
+  ],
+  "$defs": {
+    "association": {
+      "type": "object",
+      "properties": {
+        "obs": {
+          "type": "string",
+          "description": "The OBS scene to associate this field with.",
+          "nullable": true
+        },
+        "atem": {
+          "type": "number",
+          "description": "The ATEM program input to associate this field with.",
+          "nullable": true
+        }
+      }
+    },
+    "fieldsetAudienceDisplay": {
+      "type": "string",
+      "enum": [
+        "BLANK",
+        "LOGO",
+        "INTRO",
+        "IN_MATCH",
+        "RESULTS",
+        "SCHEDULE",
+        "RANKINGS",
+        "SC_RANKINGS",
+        "ALLIANCE_SELECTION",
+        "BRACKET",
+        "AWARD",
+        "INSPECTION"
+      ]
+    }
+  }
+}

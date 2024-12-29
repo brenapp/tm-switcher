@@ -3,6 +3,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
+import copy from "rollup-plugin-copy";
 
 /**
  * @type {import('rollup').RollupOptions}
@@ -20,11 +21,23 @@ const config = {
     resolve({
       preferBuiltins: true,
     }),
-    commonjs(),
+    commonjs({
+      ignoreDynamicRequires: true,
+    }),
+
+    // Copy prebuilt binaries
+    copy({
+      targets: [
+        {
+          src: "node_modules/@julusian/freetype2/prebuilds/**/*",
+          dest: "./out/switcher/externals/node_modules/@julusian/freetype2",
+        },
+      ],
+    }),
   ],
   output: {
-    file: "./out/switcher/main.js",
-    format: "esm",
+    file: "./out/switcher/main.cjs",
+    format: "commonjs",
   },
 };
 export default config;

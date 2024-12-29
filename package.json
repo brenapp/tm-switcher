@@ -6,10 +6,8 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
-    "bundle": "npm run build && rm -rf bundle && pkg package.json --options no-warnings",
-    "run": "rm -rf out && tsc && node out/switcher/main.js",
-    "rb": "npm run bundle && ./bundle/tm-switcher-macos"
+    "build": "rollup -c",
+    "run": "node out/switcher/main.js"
   },
   "dependencies": {
     "@octokit/types": "^13.5.0",
@@ -41,6 +39,7 @@
     "@types/node": "^20.9.4",
     "pkg": "^5.8.1",
     "rollup": "^4.29.1",
+    "rollup-plugin-copy": "^3.5.0",
     "rollup-plugin-typescript-paths": "^1.5.0",
     "typescript": "^5.7.2"
   }

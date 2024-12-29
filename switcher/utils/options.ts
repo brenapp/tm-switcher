@@ -1,6 +1,6 @@
 import Ajv, { JSONSchemaType } from "ajv";
 import { SwitcherOptions } from "../behavior.js";
-import { writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 
 import * as schema from "~data:schema/config.schema.json" assert { type: "json" };
 
@@ -18,5 +18,16 @@ export async function saveOptions(path: string, options: SwitcherOptions): Promi
 };
 
 export async function getOptions(path: string): Promise<SwitcherOptions | null> {
-    return null;
+    try {
+        const data = await readFile(path, "utf-8");
+        const options = JSON.parse(data);
+
+        if (!validateSwitcherOptions(options)) {
+            return null;
+        }
+        
+        return options;
+    } catch {
+        return null;
+    }
 };

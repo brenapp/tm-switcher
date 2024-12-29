@@ -1,9 +1,11 @@
-import { server, token } from "../../secret/logs.json";
 import { readFile } from "fs/promises";
 import * as os from "os";
 import inquirer from "inquirer";
-import { getFileHandles } from "../utils/input";
-import { keypress } from "../utils/authenticate";
+import { getFilePaths } from "./input.js";
+import { keypress } from "./authenticate.js";
+
+import { server, token } from "~data:secret/logs.json" assert { type: "json" };
+import { version } from "~data/package.json" assert { type: "json" };
 
 const DUMP_ENDPOINT = new URL("/dump", server);
 
@@ -39,7 +41,7 @@ export async function reportIssue(
   const frontmatter = [
     [`Email`, email],
     [`Comment`, comment],
-    [`Version`, require("../../../package.json").version],
+    [`Version`, version],
     [`Date`, new Date().toISOString()],
     [
       `System`,
@@ -47,7 +49,7 @@ export async function reportIssue(
     ],
   ];
 
-  const { logPath } = await getFileHandles();
+  const { logPath } = await getFilePaths();
   const logs = await readFile(logPath);
 
   const body = [

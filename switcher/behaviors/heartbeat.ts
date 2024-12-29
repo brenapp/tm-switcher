@@ -1,9 +1,8 @@
-import { Behavior } from "./index";
-import { log } from "../utils/logging";
+import { Behavior } from "../behavior.js";
+import { log } from "../utils/logging.js";
 
-Behavior("HEARTBEAT", async ({ attachments, connections, credentials }) => {
-
-    const { tm, obs, atem } = connections;
+export const HeartbeatBehavior: Behavior = async ({ attachments, connections, credentials }) => {
+    const { tm, obs } = connections;
     const { fieldset } = attachments;
 
     let tmTimeout: NodeJS.Timeout | null = null;
@@ -59,4 +58,4 @@ Behavior("HEARTBEAT", async ({ attachments, connections, credentials }) => {
         tmTimeout = setTimeout(tmHeartbeat, 0);
         obsTimeout = setTimeout(obsHeartbeat, 0);
     });
-});
+};

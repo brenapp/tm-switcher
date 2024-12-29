@@ -1,13 +1,9 @@
-import { Behavior } from "./index";
-import { getMatchName, getUnderlyingMatch, matchesEqual } from "../utils/match";
+import { Behavior } from "../behavior.js";
+import { getMatchName, getUnderlyingMatch, matchesEqual } from "../utils/match.js";
 import { FieldsetActiveMatchType, Match } from "vex-tm-client";
-import { log } from "../utils/logging";
+import { log } from "../utils/logging.js";
 
-/**
- * Match Recording
- **/
-Behavior("MATCH_RECORDING", async ({ associations, attachments, connections, recordingOptions }) => {
-
+export const RecordingBehavior: Behavior = async ({ associations, attachments, connections, recordingOptions }) => {
     const { recordIndividualMatches } = recordingOptions;
     const { division, fieldset } = attachments;
     const { obs, tm } = connections;
@@ -105,4 +101,4 @@ Behavior("MATCH_RECORDING", async ({ associations, attachments, connections, rec
             await stopRecording();
         }, 3000);
     });
-});
+};

@@ -11,10 +11,12 @@ import { promises as fs } from "fs";
 import { cwd } from "process";
 import { Atem } from "atem-connection";
 import OBSWebSocket from "obs-websocket-js";
-import { keypress } from "./authenticate";
+import { keypress } from "./authenticate.js";
 import { tmpdir, networkInterfaces } from "os";
-import { log } from "./logging";
-import { promptReportIssue } from "../behaviors/report";
+import { log } from "./logging.js";
+import { promptReportIssue } from "./report.js";
+
+import version from "~data/package.json" assert { type: "json" };
 
 export type TournamentAttachments = {
   fieldset: Fieldset;
@@ -346,33 +348,38 @@ export async function getAudienceDisplayOptions(): Promise<AudienceDisplayOption
 export type FileHandles = {
   timestamp: fs.FileHandle;
   log: fs.FileHandle;
+  config: fs.FileHandle;
 
   logPath: string;
   timestampPath: string;
+  configPath: string;
 };
 
-export async function getFileHandles(): Promise<
-  Pick<FileHandles, "logPath" | "timestampPath">
+export async function getFilePaths(): Promise<
+  Pick<FileHandles, "logPath" | "timestampPath" | "configPath">
 > {
   const directory = cwd();
 
-  const date = new Date().toISOString().split("T")[0];
-  const timestampPath = join(directory, `tm_switcher_${date}_times.csv`);
+  const date = new Date();
+  const timestamp = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-")
 
-  const logPath = join(tmpdir(), `tm_switcher_${date}_log.txt`);
 
-  return { logPath, timestampPath };
+  const timestampPath = join(directory, `tm_switcher_${timestamp}_times.csv`);
+  const configPath = join(directory, `tm_switcher_${timestamp}_config.json`);
+
+  const logPath = join(tmpdir(), `tm_switcher_${timestamp}_log.txt`);
+
+  return { logPath, timestampPath, configPath };
 }
 
 export async function initFileHandles(): Promise<FileHandles> {
-  const { logPath, timestampPath } = await getFileHandles();
+  const { logPath, timestampPath, configPath } = await getFilePaths();
   const timestamp = await fs.open(timestampPath, "a");
   const log = await fs.open(logPath, "a");
+  const config = await fs.open(configPath, "w");
 
   await log.write(
-    `\n\ntm-switcher v${
-      require("../../../package.json").version
-    } started at ${new Date().toISOString()}\n`
+    `\n\ntm-switcher v${version} started at ${new Date().toISOString()}\n`
   );
   await log.write(`OS:  ${process.platform} ${process.arch}\n`);
   await log.write(`Node Version:  ${process.version}\n`);
@@ -384,5 +391,5 @@ export async function initFileHandles(): Promise<FileHandles> {
     await log.write(`  ${name}: ${iface?.map((i) => i.address).join(", ")}\n`);
   }
 
-  return { timestamp, log, logPath, timestampPath };
+  return { timestamp, log, config, logPath, timestampPath, configPath };
 }

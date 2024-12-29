@@ -3,7 +3,7 @@ import {
   connectTM,
   connectOBS,
   connectATEM,
-} from "./utils/authenticate";
+} from "./utils/authenticate.js";
 import {
   getAssociations,
   getAudienceDisplayOptions,
@@ -11,22 +11,27 @@ import {
   initFileHandles,
   getRecordingOptions,
   getTournamentAttachments,
-} from "./utils/input";
-import { log, setLogFile } from "./utils/logging";
-import { promptForUpdate } from "./utils/update";
-import { BEHAVIORS } from "./behaviors";
+} from "./utils/input.js";
+import { Behavior } from "behavior.js";
+import { log, setLogFile } from "./utils/logging.js";
+import { promptForUpdate } from "./utils/update.js";
+import { AudienceDisplayBehavior } from "behaviors/display.js";
+import { HeartbeatBehavior } from "behaviors/heartbeat.js";
+import { LoggingBehavior } from "behaviors/logging.js";
+import { RecordingBehavior } from "behaviors/recording.js";
 
-import "./behaviors/display";
-import "./behaviors/recording";
-import "./behaviors/switcher";
-import "./behaviors/logging";
-import "./behaviors/heartbeat";
+import { version } from "~data/package.json" assert { type: "json" };
+
+const BEHAVIORS: { [key: string]: Behavior } = {
+  AudienceDisplayBehavior,
+  HeartbeatBehavior,
+  LoggingBehavior,
+  RecordingBehavior,
+};
 
 async function main() {
   console.log(
-    `TM Switcher v${
-      require("../../package.json").version
-    } - Created by Brendan McGuire (brendan@bren.app)`
+    `TM Switcher v${version} - Created by Brendan McGuire (brendan@bren.app)`
   );
 
   await promptForUpdate();

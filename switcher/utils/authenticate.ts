@@ -2,9 +2,10 @@ import inquirer from "inquirer";
 import { Client } from "vex-tm-client";
 import OBSWebSocket from "obs-websocket-js";
 import { Atem } from "atem-connection";
-import vextm from "../../secret/vextm.json";
-import { log } from "./logging";
-import { promptReportIssue } from "../behaviors/report";
+import { log } from "./logging.js";
+import { promptReportIssue } from "./report.js";
+
+import { client_id, client_secret, expiration_date } from "~data:secret/vextm.json" assert { type: "json" };
 
 export type TMCredentials = {
   address: string;
@@ -135,9 +136,9 @@ export async function connectTM({ address, key }: TMCredentials) {
   const client = new Client({
     address,
     authorization: {
-      client_id: vextm.client_id,
-      client_secret: vextm.client_secret,
-      expiration_date: vextm.expiration_date,
+      client_id,
+      client_secret,
+      expiration_date,
       grant_type: "client_credentials",
     },
     clientAPIKey: key,

@@ -24,13 +24,12 @@ const config = {
     commonjs({
       ignoreDynamicRequires: true,
     }),
-
     // Copy prebuilt binaries
     copy({
       targets: [
         {
           src: "node_modules/@julusian/freetype2/prebuilds/**/*",
-          dest: "./out/switcher/externals/node_modules/@julusian/freetype2",
+          dest: "./out/switcher/prebuilds",
         },
       ],
     }),

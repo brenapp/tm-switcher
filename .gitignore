@@ -5,3 +5,4 @@ out
 secret
 
 *.csv
+tm_switcher_*.json

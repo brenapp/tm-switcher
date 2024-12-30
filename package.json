@@ -6,8 +6,8 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "build": "rollup -c",
-    "run": "node out/switcher/main.cjs"
+    "switcher:build": "rollup -c",
+    "switcher:run": "node out/switcher/main.cjs"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.32.0",

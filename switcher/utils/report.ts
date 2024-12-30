@@ -1,11 +1,11 @@
 import { readFile } from "fs/promises";
 import * as os from "os";
 import inquirer from "inquirer";
-import { getFilePaths } from "./input.js";
 import { keypress } from "./authenticate.js";
 
 import { server, token } from "~data:secret/logs.json" assert { type: "json" };
 import { version } from "~data/package.json" assert { type: "json" };
+import { getFilePaths } from "./logging.js";
 
 const DUMP_ENDPOINT = new URL("/dump", server);
 

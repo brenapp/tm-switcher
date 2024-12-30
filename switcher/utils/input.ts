@@ -6,17 +6,15 @@ import {
   Fieldset,
   FieldsetAudienceDisplay,
 } from "vex-tm-client";
-import { join } from "path";
-import { promises as fs } from "fs";
-import { cwd } from "process";
+
 import { Atem } from "atem-connection";
 import OBSWebSocket from "obs-websocket-js";
 import { keypress } from "./authenticate.js";
-import { tmpdir, networkInterfaces } from "os";
 import { log } from "./logging.js";
 import { promptReportIssue } from "./report.js";
+import { deserializeOptions, getOptions, SwitcherConfigFile } from "./options.js";
+import { SwitcherConnections } from "behavior.js";
 
-import version from "~data/package.json" assert { type: "json" };
 
 export type TournamentAttachments = {
   fieldset: Fieldset;
@@ -345,51 +343,31 @@ export async function getAudienceDisplayOptions(): Promise<AudienceDisplayOption
   return flags;
 }
 
-export type FileHandles = {
-  timestamp: fs.FileHandle;
-  log: fs.FileHandle;
-  config: fs.FileHandle;
+export async function getSwitcherOptions(configPath: string, connections: SwitcherConnections) {
+  const config = await getOptions(configPath);
+  const options = await deserializeOptions(connections.tm, config);
 
-  logPath: string;
-  timestampPath: string;
-  configPath: string;
-};
+  if (!!options) {
 
-export async function getFilePaths(): Promise<
-  Pick<FileHandles, "logPath" | "timestampPath" | "configPath">
-> {
-  const directory = cwd();
+    const { useConfig } = await inquirer.prompt([
+      {
+        name: "useConfig",
+        message: `Use configuration in ${configPath}?`,
+        type: "confirm",
+        default: true,
+      }
+    ]);
 
-  const date = new Date();
-  const timestamp = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-")
-
-
-  const timestampPath = join(directory, `tm_switcher_${timestamp}_times.csv`);
-  const configPath = join(directory, `tm_switcher_${timestamp}_config.json`);
-
-  const logPath = join(tmpdir(), `tm_switcher_${timestamp}_log.txt`);
-
-  return { logPath, timestampPath, configPath };
-}
-
-export async function initFileHandles(): Promise<FileHandles> {
-  const { logPath, timestampPath, configPath } = await getFilePaths();
-  const timestamp = await fs.open(timestampPath, "a");
-  const log = await fs.open(logPath, "a");
-  const config = await fs.open(configPath, "w");
-
-  await log.write(
-    `\n\ntm-switcher v${version} started at ${new Date().toISOString()}\n`
-  );
-  await log.write(`OS:  ${process.platform} ${process.arch}\n`);
-  await log.write(`Node Version:  ${process.version}\n`);
-  await log.write(`Directory:  ${cwd()}\n`);
-
-  await log.write(`Network Interfaces: \n`);
-  const ifaces = networkInterfaces();
-  for (const [name, iface] of Object.entries(ifaces)) {
-    await log.write(`  ${name}: ${iface?.map((i) => i.address).join(", ")}\n`);
+    if (useConfig) {
+      return options;
+    }
   }
 
-  return { timestamp, log, config, logPath, timestampPath, configPath };
-}
+  const attachments = await getTournamentAttachments(connections.tm);
+  const associations = await getAssociations(attachments.fieldset, connections.obs, connections.atem);
+  const displayAssociations = await getDisplayAssociations(connections.obs, connections.atem);
+  const audienceDisplayOptions = await getAudienceDisplayOptions();
+  const recordingOptions = await getRecordingOptions(connections.obs);
+
+  return { attachments, associations, displayAssociations, audienceDisplayOptions, recordingOptions };
+};

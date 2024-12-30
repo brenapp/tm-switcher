@@ -18,5 +18,9 @@ jobs:
           node-version: "22.x"
       - name: Install dependencies
         run: npm install
-      - name: Build
+      - name: Build Switcher
         run: npm run switcher:build
+      - name: Package Switchers
+        run: npm run switcher:package
+      - name: Build Host
+        run: npm run host:build

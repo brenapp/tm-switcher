@@ -50,7 +50,7 @@ export async function deserializeOptions(tm: Client, options: SwitcherConfigFile
 export const validateSwitcherOptions = ajv.compile<SwitcherConfigFile>(schema satisfies JSONSchemaType<SwitcherConfigFile>);
 
 export async function saveOptions(path: string, options: SwitcherOptions): Promise<void> {
-    return writeFile(path, JSON.stringify(serializeOptions(options), null, 2));
+    return writeFile(path, JSON.stringify({ $schema: schema.$id, ...serializeOptions(options) }, null, 2));
 };
 
 export async function getOptions(path: string): Promise<SwitcherConfigFile | null> {

@@ -9,6 +9,10 @@
     "switcher:build": "rollup -c",
     "switcher:run": "node out/switcher/main.cjs",
     "switcher:package": "npx @yao-pkg/pkg package.json --out-path bundle && sh scripts/copy_switcher.sh",
+    "switcher:package:latest-macos-x64": "npx @yao-pkg/pkg package.json --target latest-macos-x64 --output ./bundle/tm-switcher-macos-x64 && sh scripts/copy_switcher.sh",
+    "switcher:package:latest-macos-arm64": "npx @yao-pkg/pkg package.json --target latest-macos-arm64 --output ./bundle/tm-switcher-macos-arm64 && sh scripts/copy_switcher.sh",
+    "switcher:package:latest-win-x64": "npx @yao-pkg/pkg package.json --target latest-win-x64 --output ./bundle/tm-switcher-win-x64 && sh scripts/copy_switcher.sh",
+    "switcher:package:latest-linux-x64": "npx @yao-pkg/pkg package.json --target latest-linux-x64 --output ./bundle/tm-switcher-linux-x64 && sh scripts/copy_switcher.sh",
     "host:build": "npm -w host run tauri build"
   },
   "workspaces": [

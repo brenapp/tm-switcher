@@ -21,7 +21,7 @@ jobs:
           npm install && npm -w host install
       - name: Build Switcher
         run: npm run switcher:build
-      - name: Package Switchers
-        run: npm run switcher:package
+      - name: Package Switcher
+        run: npm run switcher:package:latest-linux-x64
       - name: Build Host
         run: npm run host:build

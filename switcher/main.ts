@@ -19,6 +19,7 @@ import { AudienceDisplayBehavior } from "behaviors/display.js";
 import { HeartbeatBehavior } from "behaviors/heartbeat.js";
 import { LoggingBehavior } from "behaviors/logging.js";
 import { RecordingBehavior } from "behaviors/recording.js";
+import { CoreSwitcherBehavior } from "behaviors/switcher.js";
 
 import { version } from "~data/package.json" assert { type: "json" };
 
@@ -27,6 +28,7 @@ const BEHAVIORS: { [key: string]: Behavior } = {
   HeartbeatBehavior,
   LoggingBehavior,
   RecordingBehavior,
+  CoreSwitcherBehavior,
 };
 
 async function main() {

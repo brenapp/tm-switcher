@@ -9,12 +9,12 @@
       "type": "object",
       "properties": {
         "division": {
-          "type": "string",
-          "description": "The division to connect to."
+          "type": "number",
+          "description": "The division ID to connect to."
         },
         "fieldset": {
-          "type": "string",
-          "description": "The fieldset to connect to."
+          "type": "number",
+          "description": "The fieldset ID to connect to."
         }
       }
     },

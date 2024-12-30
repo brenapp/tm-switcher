@@ -7,9 +7,10 @@
   "license": "MIT",
   "scripts": {
     "build": "rollup -c",
-    "run": "node out/switcher/main.js"
+    "run": "node out/switcher/main.cjs"
   },
   "dependencies": {
+    "@dotenvx/dotenvx": "^1.32.0",
     "@octokit/types": "^13.5.0",
     "@types/inquirer": "^7.3.1",
     "ajv": "^8.17.1",

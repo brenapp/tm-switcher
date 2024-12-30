@@ -1,14 +1,9 @@
 import { FieldsetActiveMatchType, FieldsetAudienceDisplay, MatchRound } from "vex-tm-client";
-import { Behavior } from "./index";
-import { log } from "../utils/logging";
+import { Behavior } from "../behavior.js";
+import { log } from "../utils/logging.js";
 
-/**
- * Audience Display Automation
- **/
-Behavior("AUDIENCE_DISPLAY", async ({ attachments, audienceDisplayOptions }) => {
-
+export const AudienceDisplayBehavior: Behavior = async ({ attachments, audienceDisplayOptions }) => {
     const { fieldset } = attachments;
-
 
     fieldset.on("fieldActivated", async event => {
         if (audienceDisplayOptions.queueIntro) {
@@ -61,4 +56,4 @@ Behavior("AUDIENCE_DISPLAY", async ({ attachments, audienceDisplayOptions }) => 
             setTimeout((() => fieldset.setAudienceDisplay(FieldsetAudienceDisplay.SavedMatchResults)), 2000);
         }
     });
-});  
+};  

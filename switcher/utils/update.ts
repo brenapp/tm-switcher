@@ -1,6 +1,8 @@
 import { Endpoints } from "@octokit/types";
 import chalk from "chalk";
 
+import { version } from "~data/package.json" assert { type: "json" };
+
 export type ListReleasesResponse =
   Endpoints["GET /repos/{owner}/{repo}/releases"]["response"]["data"];
 export type Release = ListReleasesResponse[0];
@@ -68,8 +70,6 @@ export function compareVersion(current: Version, newest: Version) {
 }
 
 export async function promptForUpdate() {
-  const version: string = require("../../../package.json").version;
-
   const release = await getLatestRelease();
   if (!release) {
     return null;

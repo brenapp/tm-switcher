@@ -1,11 +1,7 @@
 import { FieldsetAudienceDisplay } from "vex-tm-client";
-import { Behavior } from "./index";
+import { Behavior } from "../behavior.js";
 
-/**
- * Core Switcher Behavior
- **/
-Behavior("CORE_SWITCHER", async ({ associations, attachments, connections, audienceDisplayOptions, displayAssociations }) => {
-
+export const CoreSwitcherBehavior: Behavior = async ({ associations, attachments, connections, audienceDisplayOptions, displayAssociations }) => {
     const { fieldset } = attachments;
     const { obs, atem } = connections;
 
@@ -56,4 +52,4 @@ Behavior("CORE_SWITCHER", async ({ associations, attachments, connections, audie
             await atem.changeProgramInput(association.atem);
         };
     });
-});
+};

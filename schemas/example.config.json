@@ -1,0 +1,26 @@
+{
+  "$schema": "./config.schema.json",
+  "attachments": {
+    "division": "Division 1",
+    "fieldset": "Fieldset 1"
+  },
+  "audienceDisplayOptions": {
+    "queueIntro": true,
+    "savedScore": true,
+    "flashRankings": true
+  },
+  "associations": {
+    "field1": {
+      "obs": "Scene 1"
+    }
+  },
+  "displayAssociations": {
+    "INTRO": {
+      "atem": 0,
+      "obs": "Intro Scene"
+    }
+  },
+  "recordingOptions": {
+    "recordIndividualMatches": false
+  }
+}

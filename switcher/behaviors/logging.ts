@@ -1,13 +1,9 @@
-import { Behavior } from "./index";
-import { log } from "../utils/logging";
-import { getMatchName, getUnderlyingMatch, matchesEqual } from "../utils/match";
-import type { Match } from "vex-tm-client/out/Match";
+import { Behavior } from "../behavior.js";
+import { log } from "../utils/logging.js";
+import { getMatchName, getUnderlyingMatch, matchesEqual } from "../utils/match.js";
+import type { Match } from "vex-tm-client";
 
-/**
- * Logging
- */
-Behavior("LOGGING", async ({ associations, attachments, connections, recordingOptions, handles }) => {
-
+export const LoggingBehavior: Behavior = async ({ associations, attachments, connections, recordingOptions, handles }) => {
     const { obs } = connections;
     const { division, fieldset } = attachments;
     const { timestamp } = handles;
@@ -110,4 +106,4 @@ Behavior("LOGGING", async ({ associations, attachments, connections, recordingOp
     fieldset.websocket?.addEventListener("close", event => {
         log("error", `TM: ${event.reason}`, false);
     })
-});
+};

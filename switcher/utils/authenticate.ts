@@ -5,7 +5,10 @@ import { Atem } from "atem-connection";
 import { log } from "./logging.js";
 import { promptReportIssue } from "./report.js";
 
-import { client_id, client_secret, expiration_date } from "~data:secret/vextm.json" assert { type: "json" };
+// TM API Credentials
+const client_id = process.env.TM_SWITCHER_VEX_TM_CLIENT_ID ?? "";
+const client_secret = process.env.TM_SWITCHER_VEX_TM_CLIENT_SECRET ?? "";
+const expiration_date = Number.parseInt(process.env.TM_SWITCHER_VEX_TM_EXPIRATION_DATE ?? "0");
 
 export type TMCredentials = {
   address: string;

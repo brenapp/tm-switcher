@@ -3,7 +3,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
-import copy from "rollup-plugin-copy";
+import dotenv from "rollup-plugin-dotenv";
 
 /**
  * @type {import('rollup').RollupOptions}
@@ -24,6 +24,7 @@ const config = {
     commonjs({
       ignoreDynamicRequires: true,
     }),
+    dotenv(),
   ],
   external: ["@julusian/freetype2", "atem-connection"],
   output: {

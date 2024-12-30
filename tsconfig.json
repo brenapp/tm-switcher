@@ -72,7 +72,6 @@
     "skipLibCheck": true /* Skip type checking of declaration files. */,
     "forceConsistentCasingInFileNames": true /* Disallow inconsistently-cased references to the same file. */,
     "paths": {
-      "~data:secret/*.json": ["../secret/*.json"],
       "~data:schema/*.json": ["../schemas/*.json"],
       "~data/package.json": ["../package.json"]
     }

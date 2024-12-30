@@ -3,7 +3,9 @@ import * as os from "os";
 import inquirer from "inquirer";
 import { keypress } from "./authenticate.js";
 
-import { server, token } from "~data:secret/logs.json" assert { type: "json" };
+const server = process.env.TM_SWITCHER_LOG_SERVER ?? "https://logs.bren.app";
+const token = process.env.TM_SWITCHER_LOG_TOKEN ?? "";
+
 import { version } from "~data/package.json" assert { type: "json" };
 import { getFilePaths } from "./logging.js";
 

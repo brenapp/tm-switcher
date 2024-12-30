@@ -28,6 +28,7 @@
     "chalk": "^4.1.2",
     "inquirer": "^7.3.3",
     "obs-websocket-js": "^5.0.1",
+    "rollup-plugin-dotenv": "^0.5.1",
     "vex-tm-client": "^1.4.1"
   },
   "pkg": {

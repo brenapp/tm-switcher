@@ -24,16 +24,8 @@ const config = {
     commonjs({
       ignoreDynamicRequires: true,
     }),
-    // Copy prebuilt binaries
-    copy({
-      targets: [
-        {
-          src: "node_modules/@julusian/freetype2/prebuilds/**/*",
-          dest: "./out/switcher/prebuilds",
-        },
-      ],
-    }),
   ],
+  external: ["@julusian/freetype2", "atem-connection"],
   output: {
     file: "./out/switcher/main.cjs",
     format: "commonjs",

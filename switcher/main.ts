@@ -1,19 +1,18 @@
 import {
-  getCredentials,
-  connectTM,
-  connectOBS,
   connectATEM,
+  connectOBS,
+  connectTM,
+  getCredentials,
 } from "./utils/authenticate.js";
+import { getSwitcherOptions } from "./utils/input.js";
+import { Behavior } from "behavior.js";
 import {
-  getAssociations,
-  getAudienceDisplayOptions,
-  getDisplayAssociations,
-  getRecordingOptions,
-  getSwitcherOptions,
-  getTournamentAttachments,
-} from "./utils/input.js";
-import { Behavior, SwitcherOptions } from "behavior.js";
-import { getFilePaths, initLogFile, log, setLogFile } from "./utils/logging.js";
+  getFilePaths,
+  initLogFile,
+  initTimestampFile,
+  log,
+  setLogFile,
+} from "./utils/logging.js";
 import { promptForUpdate } from "./utils/update.js";
 
 import { AudienceDisplayBehavior } from "behaviors/display.js";
@@ -33,10 +32,9 @@ const BEHAVIORS: { [key: string]: Behavior } = {
   CoreSwitcherBehavior,
 };
 
-
 async function main() {
   console.log(
-    `TM Switcher v${version} - Created by Brendan McGuire (brendan@bren.app)`
+    `TM Switcher v${version} - Created by Brendan McGuire (brendan@bren.app)`,
   );
 
   await promptForUpdate();
@@ -45,7 +43,7 @@ async function main() {
   // Logging
   const paths = await getFilePaths();
   const logHandle = await initLogFile(paths.logPath);
-  const timestampHandle = await initLogFile(paths.timestampPath);
+  const timestampHandle = await initTimestampFile(paths.timestampPath);
 
   setLogFile(logHandle);
 

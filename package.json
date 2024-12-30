@@ -8,7 +8,7 @@
   "scripts": {
     "switcher:build": "rollup -c",
     "switcher:run": "node out/switcher/main.cjs",
-    "switcher:package": "npx @yao-pkg/pkg package.json --out-path bundle"
+    "switcher:package": "npx @yao-pkg/pkg package.json --out-path bundle && sh scripts/copy_switcher.sh"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.32.0",
@@ -30,6 +30,7 @@
     ],
     "targets": [
       "latest-macos-x64",
+      "latest-macos-arm64",
       "latest-win-x64",
       "latest-linux-x64"
     ],

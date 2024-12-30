@@ -8,8 +8,13 @@
   "scripts": {
     "switcher:build": "rollup -c",
     "switcher:run": "node out/switcher/main.cjs",
-    "switcher:package": "npx @yao-pkg/pkg package.json --out-path bundle && sh scripts/copy_switcher.sh"
+    "switcher:package": "npx @yao-pkg/pkg package.json --out-path bundle && sh scripts/copy_switcher.sh",
+    "host:build": "npm -w host run tauri build"
   },
+  "workspaces": [
+    ".",
+    "host"
+  ],
   "dependencies": {
     "@dotenvx/dotenvx": "^1.32.0",
     "@octokit/types": "^13.5.0",

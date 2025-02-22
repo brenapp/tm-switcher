@@ -13,7 +13,8 @@
     "switcher:package:latest-macos-arm64": "npx @yao-pkg/pkg package.json --target latest-macos-arm64 --output ./bundle/tm-switcher-macos-arm64 && sh scripts/copy_switcher.sh",
     "switcher:package:latest-win-x64": "npx @yao-pkg/pkg package.json --target latest-win-x64 --output ./bundle/tm-switcher-win-x64 && sh scripts/copy_switcher.sh",
     "switcher:package:latest-linux-x64": "npx @yao-pkg/pkg package.json --target latest-linux-x64 --output ./bundle/tm-switcher-linux-x64 && sh scripts/copy_switcher.sh",
-    "host:build": "npm -w host run tauri build"
+    "host:build": "npm -w host run tauri build",
+    "host:dev": "npm -w host run tauri dev"
   },
   "workspaces": [
     ".",

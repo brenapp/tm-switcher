@@ -4,6 +4,8 @@ import { FitAddon } from "@xterm/addon-fit";
 import { ITheme, Terminal } from "@xterm/xterm";
 import colors from "tailwindcss/colors";
 
+import "@xterm/xterm/css/xterm.css"
+
 export const theme: ITheme = {
   "background": colors.zinc["900"],
   "foreground": colors.zinc["50"],

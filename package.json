@@ -2,12 +2,13 @@
   "name": "tm-switcher",
   "version": "1.10.0",
   "main": "src/main.ts",
-  "bin": "out/switcher/main.js",
+  "bin": "out/switcher/main.cjs",
   "type": "module",
   "license": "MIT",
   "scripts": {
     "switcher:build": "rollup -c",
-    "switcher:run": "node out/switcher/main.cjs"
+    "switcher:run": "node out/switcher/main.cjs",
+    "switcher:pkg": "npm run switcher:build && rm -rf bundle && pkg package.json --options no-warnings"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.32.0",

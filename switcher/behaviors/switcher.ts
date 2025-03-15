@@ -17,6 +17,11 @@ export const CoreSwitcherBehavior: Behavior = async ({ associations, attachments
         };
     }
 
+    fieldset.on("fieldMatchAssigned", async event => {
+        const { fieldID } = event;
+        await switchTo(fieldID);
+    });
+
     fieldset.on("matchStarted", async match => {
         const { fieldID } = match;
         await switchTo(fieldID);

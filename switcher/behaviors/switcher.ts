@@ -3,7 +3,7 @@ import { Behavior } from "../behavior.js";
 
 export const CoreSwitcherBehavior: Behavior = async ({ associations, attachments, connections, audienceDisplayOptions, displayAssociations }) => {
     const { fieldset } = attachments;
-    const { obs, atem } = connections;
+    const { obs } = connections;
 
     async function switchTo(fieldID: number) {
         const association = associations[fieldID];
@@ -11,10 +11,6 @@ export const CoreSwitcherBehavior: Behavior = async ({ associations, attachments
         if (obs && association?.obs) {
             await obs.call("SetCurrentProgramScene", { sceneName: association.obs });
         }
-
-        if (atem && association?.atem) {
-            await atem.changeProgramInput(association.atem);
-        };
     }
 
     fieldset.on("fieldMatchAssigned", async event => {
@@ -52,9 +48,5 @@ export const CoreSwitcherBehavior: Behavior = async ({ associations, attachments
         if (obs && association?.obs) {
             await obs.call("SetCurrentProgramScene", { sceneName: association.obs });
         }
-
-        if (atem && association?.atem) {
-            await atem.changeProgramInput(association.atem);
-        };
     });
 };

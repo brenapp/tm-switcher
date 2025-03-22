@@ -1,7 +1,7 @@
 import { readFile } from "fs/promises";
 import * as os from "os";
 import inquirer from "inquirer";
-import { keypress } from "./authenticate.js";
+import { keypress } from "./keypress.js";
 
 import { server, token } from "~data:secret/logs.json" assert { type: "json" };
 import { version } from "~data/package.json" assert { type: "json" };

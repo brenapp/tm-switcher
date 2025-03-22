@@ -1,7 +1,6 @@
 import inquirer from "inquirer";
 import { Client } from "vex-tm-client";
 import OBSWebSocket from "obs-websocket-js";
-import { Atem } from "atem-connection";
 import { log } from "./logging.js";
 import { promptReportIssue } from "./report.js";
 
@@ -124,13 +123,6 @@ export async function getCredentials(): Promise<Credentials> {
   return { tm, obs, atem };
 }
 
-export async function keypress() {
-  return new Promise((resolve, reject) => {
-    process.stdin.setRawMode(true);
-    process.stdin.resume();
-    process.stdin.on("data", resolve);
-  });
-}
 
 export async function connectTM({ address, key }: TMCredentials) {
   const client = new Client({
@@ -188,46 +180,4 @@ export async function connectOBS(creds: OBSCredentials | null) {
     await promptReportIssue(`${e}`);
     process.exit(1);
   }
-}
-
-export async function connectATEM(
-  creds: ATEMCredentials | null
-): Promise<Atem | null> {
-  if (!creds?.address) {
-    return null;
-  }
-
-  return new Promise((resolve) => {
-    const atem = new Atem();
-
-    // In order to suppress a message, add nothing listeners
-    process.on("exit", () => {});
-    process.on("uncaughtException", () => {});
-    process.on("unhandledRejection", () => {});
-
-    atem.connect(creds?.address);
-
-    const timeout = setTimeout(async () => {
-      log(
-        "error",
-        `Could not connect to ATEM device`,
-        `❌ ATEM: Could not connect to switcher`
-      );
-      atem.disconnect();
-      await promptReportIssue("Could not connect to ATEM device");
-      process.exit(1);
-    }, 15000);
-
-    atem.on("connected", () => {
-      clearTimeout(timeout);
-      atem.on("info", (message) => log("info", `ATEM: ${message}`));
-      atem.on("error", (message) => log("error", `ATEM: ${message}`));
-
-      for (const [name, input] of Object.entries(atem.state?.inputs ?? {})) {
-        log("info", `ATEM Input Discovered: ${input?.shortName} (${name})`);
-      }
-
-      resolve(atem);
-    });
-  });
 }

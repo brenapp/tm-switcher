@@ -7,8 +7,8 @@
   "license": "MIT",
   "scripts": {
     "switcher:build": "rollup -c",
-    "switcher:run": "node out/switcher/main.cjs",
-    "switcher:pkg": "npm run switcher:build && rm -rf bundle && pkg package.json --options no-warnings"
+    "switcher:run": "deno -A out/switcher/main.cjs",
+    "switcher:pkg": "npm run switcher:build && rm -rf bundle && deno compile --no-check --allow-all --output bundle/switcher out/switcher/main.cjs --target aarch64-apple-darwin"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.32.0",
@@ -19,18 +19,6 @@
     "inquirer": "^7.3.3",
     "obs-websocket-js": "^5.0.1",
     "vex-tm-client": "^1.4.1"
-  },
-  "pkg": {
-    "assets": [
-      "node_modules/@julusian/freetype2/prebuilds/**/*",
-      "secret/**/*"
-    ],
-    "targets": [
-      "latest-macos-x64",
-      "latest-win-x64",
-      "latest-linux-x64"
-    ],
-    "outputPath": "bundle"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.2",

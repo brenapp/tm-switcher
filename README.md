@@ -6,8 +6,6 @@ This application provides automation to simplify the workload of running a lives
 
 - Integrates with OBS to automatically change scenes when matches are queued or started
 
-- Capable of controlling an ATEM switcher over the network when matches are queued or started
-
 - Record timestamps for when each match starts and its timestamp in the livestream
 
 - Create recordings for every match

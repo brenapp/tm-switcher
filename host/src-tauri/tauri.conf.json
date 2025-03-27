@@ -34,7 +34,14 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "all",
+          "windows": ["*"],
+          "permissions": ["core:default"]
+        }
+      ]
     }
   }
 }

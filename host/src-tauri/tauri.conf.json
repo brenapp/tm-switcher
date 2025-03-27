@@ -25,14 +25,7 @@
   "plugins": {},
   "app": {
     "withGlobalTauri": true,
-    "windows": [
-      {
-        "title": "TM Switcher",
-        "width": 950,
-        "height": 600,
-        "useHttpsScheme": true
-      }
-    ],
+    "windows": [],
     "security": {
       "csp": null,
       "capabilities": [

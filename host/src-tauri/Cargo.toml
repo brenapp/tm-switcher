@@ -19,6 +19,9 @@ anyhow = "1.0.86"
 unescape = "0.1.0"
 portable-pty = { version = "0.8.1", features = ["serde_support"] }
 
+[target."cfg(target_os = \"macos\")".dependencies]
+cocoa = "0.26"
+
 
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!

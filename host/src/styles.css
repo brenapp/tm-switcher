@@ -22,6 +22,20 @@
   --selection-foreground: #f2f4f8;
 }
 
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#terminal {
+  height: 100%;
+  width: 100%;
+  background-color: var(--background);
+}
 
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;

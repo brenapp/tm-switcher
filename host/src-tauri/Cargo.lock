@@ -3642,7 +3642,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tm-switcher"
+name = "tm-switcher-host"
 version = "0.1.0"
 dependencies = [
  "anyhow",

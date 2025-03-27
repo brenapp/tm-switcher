@@ -16,7 +16,7 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": ["../../bundle"]
+    "externalBin": ["../../bundle/tm-switcher"]
   },
   "productName": "tm-switcher",
   "mainBinaryName": "tm-switcher",

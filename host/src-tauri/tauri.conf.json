@@ -28,7 +28,7 @@
     "windows": [
       {
         "title": "TM Switcher",
-        "width": 800,
+        "width": 950,
         "height": 600,
         "useHttpsScheme": true
       }

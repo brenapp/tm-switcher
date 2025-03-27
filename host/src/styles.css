@@ -38,3 +38,7 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 }
+
+.xterm .xterm-viewport {
+  overflow-y: auto !important;
+}

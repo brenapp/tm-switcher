@@ -25,6 +25,7 @@ fn begin(app: AppHandle, process: Channel<ProcessEvent>, size: PtySize) -> () {
     ));
 
     let data_process = Arc::clone(&process);
+    let app_clone = app.clone();
     app.listen("data", move |event| {
         let payload = event.payload().as_bytes();
         let payload: Result<serde_json::Value, _> = serde_json::from_slice(payload);
@@ -39,7 +40,9 @@ fn begin(app: AppHandle, process: Channel<ProcessEvent>, size: PtySize) -> () {
             )
             .unwrap();
             let mut process = data_process.lock().unwrap();
-            process.write(output.as_bytes()).unwrap();
+            if let Err(_) = process.write(output.as_bytes()) {
+                app_clone.exit(0);
+            }
         }
     });
 

@@ -1,4 +1,5 @@
 import { invoke, Channel } from "@tauri-apps/api/core"; 
+import { exit } from "@tauri-apps/plugin-process";
 import { emit } from "@tauri-apps/api/event";
 import { FitAddon } from "@xterm/addon-fit";
 import { ITheme, Terminal } from "@xterm/xterm";
@@ -65,7 +66,6 @@ export type ProcessEvent = {
   event: "terminated";
 }
 
-
 async function createTTY() {
   const theme = getTheme();
 
@@ -109,12 +109,12 @@ async function createTTY() {
     if (message.event === "output") {
       terminal.write(new Uint8Array(message.data));
     } else if (message.event === "terminated") {
-      terminal.dispose();
+      exit(0);
     }
   };
 
   terminal.onData((data) => {
-    emit("data", data);
+      emit("data", data);
   });
 }
 

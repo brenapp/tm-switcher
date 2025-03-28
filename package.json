@@ -8,10 +8,10 @@
   "scripts": {
     "switcher:build": "rollup -c",
     "switcher:run": "deno -A out/switcher/main.cjs",
-    "switcher:compile:aarch64-apple-darwin": "deno compile --no-check --allow-all --output bundle/tm-switcher-aarch64-apple-darwin out/switcher/main.cjs --target aarch64-apple-darwin",
-    "switcher:compile:x86_64-unknown-linux-gnu": "deno compile --no-check --allow-all --output bundle/tm-switcher-x86_64-unknown-linux-gnu out/switcher/main.cjs --target x86_64-unknown-linux-gnu",
-    "switcher:compile:x86_64-pc-windows-gnu": "deno compile --no-check --allow-all --output bundle/tm-switcher-x86_64-pc-windows-gnu out/switcher/main.cjs --target x86_64-pc-windows-gnu",
-    "switcher:compile:prepare": "rm -rf bundle && mkdir bundle && npm run switcher:build"
+    "switcher:compile:aarch64-apple-darwin": "deno compile --no-check --allow-all --output bin/tm-switcher-aarch64-apple-darwin out/switcher/main.cjs --target aarch64-apple-darwin",
+    "switcher:compile:x86_64-unknown-linux-gnu": "deno compile --no-check --allow-all --output bin/tm-switcher-x86_64-unknown-linux-gnu out/switcher/main.cjs --target x86_64-unknown-linux-gnu",
+    "switcher:compile:x86_64-pc-windows-gnu": "deno compile --no-check --allow-all --output bin/tm-switcher-x86_64-pc-windows-gnu out/switcher/main.cjs --target x86_64-pc-windows-gnu",
+    "switcher:compile:prepare": "rm -rf bin && mkdir bin && npm run switcher:build"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.32.0",

@@ -16,8 +16,15 @@ use unescape::unescape;
 
 #[tauri::command]
 fn begin(app: AppHandle, process: Channel<ProcessEvent>, size: PtySize) -> () {
-    let command = app.shell().sidecar("tm-switcher").unwrap();
-    let command: Command = command.into();
+
+    let sidecar = app.shell().sidecar("tm-switcher");
+    let command: Command = match sidecar {
+        Ok(command) => command.into(),
+        Err(_) => {
+            app.exit(0);
+            return;
+        }
+    };
     let command = CommandBuilder::new(command.get_program());
 
     let process = Arc::new(Mutex::new(

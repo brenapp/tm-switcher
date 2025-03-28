@@ -1,5 +1,5 @@
 node_modules
-bundle
+bin
 out
 .DS_Store
 secret

@@ -18,14 +18,11 @@ pub enum ProcessEvent {
     Terminated,
 }
 
-pub(crate) struct Process {
+pub struct Process {
     pty: PtyPair,
-
     handle: JoinHandle<()>,
-
     process: Box<dyn Child + Send + Sync>,
     writer: Box<dyn Write + Send>,
-    web: Channel<ProcessEvent>,
 }
 
 pub struct ProcessOptions {
@@ -67,7 +64,6 @@ impl Process {
             handle: write_handle,
             writer,
             process: child,
-            web: options.web,
         })
     }
 
@@ -83,5 +79,12 @@ impl Write for Process {
 
     fn flush(&mut self) -> std::io::Result<()> {
         self.writer.flush()
+    }
+}
+
+impl Drop for Process {
+    fn drop(&mut self) {
+        self.handle.abort();
+        self.process.kill().ok();
     }
 }

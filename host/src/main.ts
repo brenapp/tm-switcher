@@ -2,6 +2,7 @@ import { invoke, Channel } from "@tauri-apps/api/core";
 import { exit } from "@tauri-apps/plugin-process";
 import { emit } from "@tauri-apps/api/event";
 import { FitAddon } from "@xterm/addon-fit";
+import { WebLinksAddon } from '@xterm/addon-web-links';
 import { ITheme, Terminal } from "@xterm/xterm";
 
 const VARIABLES = [
@@ -87,6 +88,9 @@ async function createTTY() {
   terminal.loadAddon(fitAddon);
   fitAddon.fit();
 
+  const webLinksAddon = new WebLinksAddon();
+  terminal.loadAddon(webLinksAddon);
+
   const observer = new ResizeObserver((entries) => {
     const entry = entries[0];
 
@@ -121,3 +125,5 @@ async function createTTY() {
 window.addEventListener("DOMContentLoaded", async () => {
   await createTTY();
 });
+
+

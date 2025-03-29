@@ -35,7 +35,7 @@ const config = {
     }),
   ],
   output: {
-    file: "./out/switcher/main.cjs",
+    file: "../out/switcher/main.cjs",
     format: "commonjs",
   },
 };

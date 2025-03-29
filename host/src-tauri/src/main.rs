@@ -25,7 +25,12 @@ fn begin(app: AppHandle, process: Channel<ProcessEvent>, size: PtySize) -> () {
             return;
         }
     };
-    let command = CommandBuilder::new(command.get_program());
+    let mut command = CommandBuilder::new(command.get_program());
+
+    // Advertise terminal information to the child process
+    command.env("COLOR", "1");
+    command.env("TERM", "xterm-256color");
+    command.env("TERM_PROGRAM", "tm-switcher-host");
 
     let process = Arc::new(Mutex::new(
         crate::process::Process::new(command, ProcessOptions { size, web: process }).unwrap(),

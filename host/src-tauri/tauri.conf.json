@@ -18,8 +18,8 @@
     ],
     "externalBin": ["../../bin/tm-switcher"]
   },
-  "productName": "tm-switcher",
-  "mainBinaryName": "tm-switcher",
+  "productName": "TM Switcher",
+  "mainBinaryName": "tm-switcher-host",
   "version": "0.1.0",
   "identifier": "app.bren.tm-switcher",
   "plugins": {},

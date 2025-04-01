@@ -29,6 +29,7 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^20.9.4",
+    "deno": "^2.2.6",
     "pkg": "^5.8.1",
     "rollup": "^4.29.1",
     "rollup-plugin-copy": "^3.5.0",

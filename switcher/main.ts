@@ -6,18 +6,18 @@ import {
 import {
   getSwitcherOptions,
 } from "./utils/input.js";
-import { Behavior, SwitcherOptions } from "behavior.js";
+import { Behavior } from "./behavior.js";
 import { getFilePaths, initLogFile, log, setLogFile } from "./utils/logging.js";
 import { promptForUpdate } from "./utils/update.js";
 
-import { AudienceDisplayBehavior } from "behaviors/display.js";
-import { HeartbeatBehavior } from "behaviors/heartbeat.js";
-import { LoggingBehavior } from "behaviors/logging.js";
-import { RecordingBehavior } from "behaviors/recording.js";
-import { CoreSwitcherBehavior } from "behaviors/switcher.js";
+import { AudienceDisplayBehavior } from "./behaviors/display.js";
+import { HeartbeatBehavior } from "./behaviors/heartbeat.js";
+import { LoggingBehavior } from "./behaviors/logging.js";
+import { RecordingBehavior } from "./behaviors/recording.js";
+import { CoreSwitcherBehavior } from "./behaviors/switcher.js";
 
 import { version } from "~data/package.json" assert { type: "json" };
-import { saveOptions } from "utils/options.js";
+import { saveOptions } from "./utils/options.js";
 
 const BEHAVIORS: { [key: string]: Behavior } = {
   AudienceDisplayBehavior,

@@ -10,7 +10,7 @@ import OBSWebSocket from "obs-websocket-js";
 import { log } from "./logging.js";
 import { promptReportIssue } from "./report.js";
 import { deserializeOptions, getOptions } from "./options.js";
-import { SwitcherConnections } from "behavior.js";
+import { SwitcherConnections } from "../behavior.js";
 import { keypress } from "./keypress.js";
 
 

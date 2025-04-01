@@ -48,7 +48,7 @@ const config = {
     generateDenoJson,
   ],
   output: {
-    file: "../out/switcher/main.cjs",
+    file: "./out/switcher/main.cjs",
     format: "commonjs",
   },
 };

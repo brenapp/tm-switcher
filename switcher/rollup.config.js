@@ -3,7 +3,22 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
-import copy from "rollup-plugin-copy";
+
+
+/**
+ * @type {import('rollup').Plugin}
+ **/
+const generateDenoJson = {
+  name: "generate-deno-json",
+  apply: "build",
+  async buildStart() {
+    this.emitFile({
+      type: "asset",
+      fileName: "deno.json",
+      source: JSON.stringify({}),
+    });
+  },
+};
 
 /**
  * @type {import('rollup').RollupOptions}
@@ -24,15 +39,13 @@ const config = {
     commonjs({
       ignoreDynamicRequires: true,
     }),
-    // Copy prebuilt binaries
-    copy({
-      targets: [
-        {
-          src: "node_modules/@julusian/freetype2/prebuilds/**/*",
-          dest: "./out/switcher/prebuilds",
-        },
-      ],
-    }),
+    /**
+     * Emit an empty deno.json file as a sibling to the output bundle. This is
+     * to prevent deno compile from guamlessly trying to include node_modules
+     * and host/node_modules in the output bundle, tripling the size of the
+     * binary.
+     **/
+    generateDenoJson,
   ],
   output: {
     file: "../out/switcher/main.cjs",

@@ -68,11 +68,11 @@ jobs:
         if: matrix.platform == 'macos-latest' && matrix.args == '--target x86_64-apple-darwin'
         run: |
           npm run switcher:compile:x86_64-apple-darwin
-      - name: npm run switcher:compile:windows
+      - name: npm run switcher:compile:x86_64-pc-windows-gnu
         if: matrix.platform == 'windows-latest'
         run: |
           npm run switcher:compile:x86_64-pc-windows-gnu
-      - name: npm run switcher:compile:linux
+      - name: npm run switcher:compile:x86_64-unknown-linux-gnu
         if: matrix.platform == 'ubuntu-22.04'
         run: |
           npm run switcher:compile:x86_64-unknown-linux-gnu

@@ -81,8 +81,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          releaseId: ${{ github.event.head_commit.id }}
           appName: 'TM Switcher'
+          tagName: ${{ github.event.head_commit.id }}
           appVersion: ${{ github.ref_name  }} 
           releaseName: 'TM Switcher v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'

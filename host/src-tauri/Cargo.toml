@@ -1,27 +1,28 @@
 [package]
-name = "host"
+name = "tm-switcher-host"
 version = "0.1.0"
-description = "A Tauri App"
-authors = ["you"]
+description = "Desktop Host for TM Switcher"
+authors = ["Brendan McGuire <brendan@bren.app>"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "2.0.0-rc", features = [] }
+tauri-build = { version = "2", features = [] }
 
 [dependencies]
-tauri = { version = "2.0.0-rc", features = [] }
+tauri = { version = "2", features = [] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tauri-plugin-shell = "2.0.0-rc"
+tauri-plugin-shell = "2"
 anyhow = "1.0.86"
 unescape = "0.1.0"
 portable-pty = { version = "0.8.1", features = ["serde_support"] }
 
+[target."cfg(target_os = \"macos\")".dependencies]
+cocoa = "0.26"
+
+
 [features]
 # This feature is used for production builds or when a dev server is not specified, DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
-
-[profile.dev]
-incremental = true

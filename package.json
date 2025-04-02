@@ -1,14 +1,18 @@
 {
   "name": "tm-switcher",
-  "version": "1.10.1",
+  "version": "1.11.0",
   "main": "src/main.ts",
   "bin": "out/switcher/main.cjs",
   "type": "module",
   "license": "MIT",
   "scripts": {
     "switcher:build": "rollup -c",
-    "switcher:run": "node out/switcher/main.cjs",
-    "switcher:pkg": "npm run switcher:build && rm -rf bundle && pkg package.json --options no-warnings"
+    "switcher:run": "deno -A out/switcher/main.cjs",
+    "switcher:compile:aarch64-apple-darwin": "deno compile --no-check --allow-all --output bin/tm-switcher-aarch64-apple-darwin out/switcher/main.cjs --target aarch64-apple-darwin",
+    "switcher:compile:x86_64-apple-darwin": "deno compile --no-check --allow-all --output bin/tm-switcher-x86_64-apple-darwin out/switcher/main.cjs --target x86_64-apple-darwin",
+    "switcher:compile:x86_64-unknown-linux-gnu": "deno compile --no-check --allow-all --output bin/tm-switcher-x86_64-unknown-linux-gnu out/switcher/main.cjs --target x86_64-unknown-linux-gnu",
+    "switcher:compile:x86_64-pc-windows-gnu": "deno compile --no-check --allow-all --output bin/tm-switcher-x86_64-pc-windows-gnu out/switcher/main.cjs --target x86_64-pc-windows-gnu",
+    "switcher:compile:prepare": "rm -rf bin && mkdir bin && npm run switcher:build"
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^1.32.0",
@@ -20,24 +24,13 @@
     "obs-websocket-js": "^5.0.1",
     "vex-tm-client": "^1.4.1"
   },
-  "pkg": {
-    "assets": [
-      "node_modules/@julusian/freetype2/prebuilds/**/*",
-      "secret/**/*"
-    ],
-    "targets": [
-      "latest-macos-x64",
-      "latest-win-x64",
-      "latest-linux-x64"
-    ],
-    "outputPath": "bundle"
-  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.2",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^20.9.4",
+    "deno": "^2.2.6",
     "pkg": "^5.8.1",
     "rollup": "^4.29.1",
     "rollup-plugin-copy": "^3.5.0",

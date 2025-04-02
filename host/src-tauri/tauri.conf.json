@@ -1,5 +1,5 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "$schema": "https://schema.tauri.app/config/2",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
@@ -16,25 +16,25 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "externalBin": [
-      "binaries/tm-switcher"
-    ]
+    "externalBin": ["../../bin/tm-switcher"]
   },
-  "productName": "host",
+  "productName": "TM Switcher",
+  "mainBinaryName": "tm-switcher-host",
   "version": "0.1.0",
-  "identifier": "app.bren.host",
+  "identifier": "app.bren.tm-switcher",
   "plugins": {},
   "app": {
     "withGlobalTauri": true,
-    "windows": [
-      {
-        "title": "Host",
-        "width": 800,
-        "height": 600
-      }
-    ],
+    "windows": [],
     "security": {
-      "csp": null
+      "csp": null,
+      "capabilities": [
+        {
+          "identifier": "all",
+          "windows": ["*"],
+          "permissions": ["core:default"]
+        }
+      ]
     }
   }
 }

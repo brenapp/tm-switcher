@@ -1,63 +1,92 @@
-# Publishes a Release Candidate when a push to master with a tag is detected
+# Creates a Release Candidate on push
 
 name: Release Candidate
+
 on:
   push:
-    branches:
-      - master
-    tags:
-      - "v*"
-
+    tags: 
+      - 'v*.*.*' # This will trigger the workflow on any tag that starts with v, followed by any number of digits and dots.
 jobs:
-  build-switcher:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: "22.x"
-      - name: Install Dependencies (switcher)
-        run: npm install
-      - name: Build Switcher
-        run: sh ./scripts/compile_switcher.sh
-  publish:
+  create-release-candidate:
     permissions:
       contents: write
     strategy:
       fail-fast: false
       matrix:
         include:
-          - platform: "macos-latest"
-            args: "--target aarch64-apple-darwin"
-          - platform: "macos-latest"
-            args: "--target x86_64-apple-darwin"
-          - platform: "ubuntu-22.04"
-            args: ""
-          - platform: "windows-latest"
-            args: ""
+          - platform: 'macos-latest' # for Arm based macs (M1 and above).
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest' # for Intel based macs.
+            args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04' # for Tauri v1 you could replace this with ubuntu-20.04.
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
+
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Install Dependencies (host)
-        working-directory: host
-        run: npm install
-      - name: install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+      - uses: actions/checkout@v4
+
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
         run: |
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm' # Set this to npm, yarn or pnpm.
+
+      - name: install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: npm ci
+        run: | 
+          npm ci 
+          npm --prefix host ci
+      
+      - name: npm switcher:build
+        run: |
+            npm run switcher:build
+
+      # Compile to Native 
+      - name: npm run switcher:compile:aarch64-apple-darwin
+        if: matrix.platform == 'macos-latest' && matrix.args == '--target aarch64-apple-darwin'
+        run: |
+          npm run switcher:compile:aarch64-apple-darwin
+      - name: npm run switcher:compile:x86_64-apple-darwin
+        if: matrix.platform == 'macos-latest' && matrix.args == '--target x86_64-apple-darwin'
+        run: |
+          npm run switcher:compile:x86_64-apple-darwin
+      - name: npm run switcher:compile:windows
+        if: matrix.platform == 'windows-latest'
+        run: |
+          npm run switcher:compile:x86_64-pc-windows-gnu
+      - name: npm run switcher:compile:linux
+        if: matrix.platform == 'ubuntu-22.04'
+        run: |
+          npm run switcher:compile:x86_64-unknown-linux-gnu
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: v__VERSION__
-          releaseName: "TM Switcher v__VERSION__"
-          releaseBody: "This build was created automatically as a release canddiate."
+          appName: 'TM Switcher'
+          appVersion: ${{ github.ref_name  }} 
+          releaseName: 'TM Switcher v__VERSION__'
+          releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
-          prerelease: true
+          includeUpdaterJson: true
+          prerelease: false
+          projectPath: ./host
           args: ${{ matrix.args }}

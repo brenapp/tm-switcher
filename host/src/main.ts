@@ -1,62 +1,109 @@
 import { invoke, Channel } from "@tauri-apps/api/core"; 
-import { emit } from '@tauri-apps/api/event'
+import { exit } from "@tauri-apps/plugin-process";
+import { emit } from "@tauri-apps/api/event";
 import { FitAddon } from "@xterm/addon-fit";
+import { WebLinksAddon } from '@xterm/addon-web-links';
 import { ITheme, Terminal } from "@xterm/xterm";
-import colors from "tailwindcss/colors";
 
-export const theme: ITheme = {
-  "background": colors.zinc["900"],
-  "foreground": colors.zinc["50"],
-  "black": colors.zinc["900"],
-  "brightBlack": colors.zinc["950"],
-  "white": colors.zinc["50"],
-  "brightBlue": colors.blue["300"],
-  "brightCyan": colors.cyan["300"],
-  "brightGreen": colors.emerald["300"],
-  "brightMagenta":colors.fuchsia["300"],
-  "brightRed": colors.red["300"],
-  "brightWhite": colors.zinc["50"],
-  "brightYellow": colors.yellow["300"],
-  "blue": colors.blue["400"],
-  "cyan": colors.cyan["400"],
-  "green": colors.green["400"],
-  "magenta": colors.fuchsia["400"],
-  "red": colors.red["400"],
-  "yellow": colors.yellow["400"],
-};
+const VARIABLES = [
+  "--palette0",
+  "--palette1",
+  "--palette2",
+  "--palette3",
+  "--palette4",
+  "--palette5",
+  "--palette6",
+  "--palette7",
+  "--palette8",
+  "--palette9",
+  "--palette10",
+  "--palette11",
+  "--palette12",
+  "--palette13",
+  "--palette14",
+  "--palette15",
+  "--background",
+  "--foreground",
+  "--cursor-color",
+  "--selection-background",
+  "--selection-foreground",
+] as const;
 
-type ProcessEvent = {
+function getTheme(): ITheme {
+  const style = window.getComputedStyle(document.body);
+  const colors = Object.fromEntries(
+    VARIABLES.map((variable) => [variable, style.getPropertyValue(variable)]),
+  ) as Record<typeof VARIABLES[number], string>;
+
+  return {
+    background: colors["--background"],
+    foreground: colors["--foreground"],
+    cursor: colors["--cursor-color"],
+    selectionBackground: colors["--selection-background"],
+    selectionForeground: colors["--selection-foreground"],
+    black: colors["--palette0"],
+    red: colors["--palette1"],
+    green: colors["--palette2"],
+    yellow: colors["--palette3"],
+    blue: colors["--palette4"],
+    magenta: colors["--palette5"],
+    cyan: colors["--palette6"],
+    white: colors["--palette7"],
+    brightBlack: colors["--palette8"],
+    brightRed: colors["--palette9"],
+    brightGreen: colors["--palette10"],
+    brightYellow: colors["--palette11"],
+    brightBlue: colors["--palette12"],
+    brightMagenta: colors["--palette13"],
+    brightCyan: colors["--palette14"],
+    brightWhite: colors["--palette15"],
+  };
+}
+
+export type ProcessEvent = {
   event: "output";
   data: number[];
 } | {
   event: "terminated";
 }
 
-
 async function createTTY() {
+  const theme = getTheme();
 
-  const terminal = new Terminal({ theme, cursorBlink: true, allowProposedApi: true, allowTransparency: true});
-  
+  const terminal = new Terminal({
+    theme,
+    cursorBlink: true,
+    allowProposedApi: true,
+    allowTransparency: true,
+  });
+
   const element = document.getElementById("terminal");
   if (!element) {
     return;
   }
+
   terminal.open(element);
 
-  // Fit the terminal to the container
   const fitAddon = new FitAddon();
   terminal.loadAddon(fitAddon);
   fitAddon.fit();
 
+  const webLinksAddon = new WebLinksAddon();
+  terminal.loadAddon(webLinksAddon);
+
   const observer = new ResizeObserver((entries) => {
     const entry = entries[0];
-    
+
     fitAddon.fit();
-    emit("resize", {  cols: terminal.cols, rows: terminal.rows, pixel_height: entry.contentRect.height, pixel_width: entry.contentRect.width });
+    emit("resize", {
+      cols: terminal.cols,
+      rows: terminal.rows,
+      pixel_height: entry.contentRect.height,
+      pixel_width: entry.contentRect.width,
+    });
   });
   observer.observe(element);
 
-  // Begin the hosted process
   const process  = new Channel<ProcessEvent>();
   const size = { cols: terminal.cols, rows: terminal.rows, pixel_height: element.clientHeight, pixel_width: element.clientWidth };
 
@@ -66,22 +113,17 @@ async function createTTY() {
     if (message.event === "output") {
       terminal.write(new Uint8Array(message.data));
     } else if (message.event === "terminated") {
-      terminal.dispose();
+      exit(0);
     }
   };
 
   terminal.onData((data) => {
-    emit("data", data);
+      emit("data", data);
   });
+}
 
-};
+window.addEventListener("DOMContentLoaded", async () => {
+  await createTTY();
+});
 
-export function loadTheme(theme: ITheme) {
-  for (const [key, value] of Object.entries(theme)) {
-      document.body.style.setProperty(`--${key}`, value);
-  };
-};
 
-loadTheme(theme);
-
-window.addEventListener("DOMContentLoaded", createTTY);

@@ -1,10 +1,59 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+:root {
+  --palette0: #282828;
+  --palette1: #ee5396;
+  --palette2: #25be6a;
+  --palette3: #08bdba;
+  --palette4: #78a9ff;
+  --palette5: #be95ff;
+  --palette6: #33b1ff;
+  --palette7: #dfdfe0;
+  --palette8: #484848;
+  --palette9: #f16da6;
+  --palette10: #46c880;
+  --palette11: #2dc7c4;
+  --palette12: #8cb6ff;
+  --palette13: #c8a5ff;
+  --palette14: #52bdff;
+  --palette15: #e4e4e5;
+  --background: #161616;
+  --foreground: #f2f4f8;
+  --cursor-color: #e4e4e5;
+  --selection-background: #2a2a2a;
+  --selection-foreground: #f2f4f8;
+}
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
 
 #terminal {
-  width: 100vw;
-  height: 100vh;
+  height: 100%;
+  width: 100%;
+  padding: 0.5rem;
   background-color: var(--background);
-  padding: 8px;
+}
+
+:root {
+  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 400;
+
+  color: var(--foreground);
+    background-color: var(--background);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+.xterm .xterm-viewport {
+  overflow-y: auto !important;
 }

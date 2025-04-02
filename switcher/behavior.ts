@@ -6,9 +6,9 @@ import {
   FieldAssociations,
   RecordingOptions,
   TournamentAttachments,
-} from "utils/input.js";
+} from "./utils/input.js";
 import { Client } from "vex-tm-client";
-import { FileHandles } from "utils/logging.js";
+import { FileHandles } from "./utils/logging.js";
 
 export type SwitcherOptions = {
   attachments: TournamentAttachments;

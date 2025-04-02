@@ -1,4 +1,3 @@
-import { cwd } from "process";
 import { networkInterfaces, tmpdir } from "os";
 import { join } from "path";
 import { FileHandle, open } from "fs/promises";
@@ -36,16 +35,14 @@ export type FilePaths = {
 };
 
 export async function getFilePaths(): Promise<FilePaths> {
-  const directory = cwd();
+  const directory = tmpdir();
 
   const date = new Date();
   const timestamp = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-")
 
-
   const timestampPath = join(directory, `tm_switcher_${timestamp}_times.csv`);
   const configPath = join(directory, `tm_switcher_${timestamp}_config.json`);
-
-  const logPath = join(tmpdir(), `tm_switcher_${timestamp}_log.txt`);
+  const logPath = join(directory, `tm_switcher_${timestamp}_log.txt`);
 
   return { logPath, timestampPath, configPath };
 }
@@ -58,12 +55,12 @@ export async function initLogFile(path: string) {
   );
   await log.write(`OS:  ${process.platform} ${process.arch}\n`);
   await log.write(`Node Version:  ${process.version}\n`);
-  await log.write(`Directory:  ${cwd()}\n`);
+  await log.write(`Temp Dir:  ${tmpdir()}\n`);
 
   await log.write(`Network Interfaces: \n`);
-  const ifaces = networkInterfaces();
+  const interfaces = networkInterfaces();
   
-  for (const [name, iface] of Object.entries(ifaces)) {
+  for (const [name, iface] of Object.entries(interfaces)) {
     await log.write(`  ${name}: ${iface?.map((i) => i.address).join(", ")}\n`);
   }
 

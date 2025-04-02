@@ -69,7 +69,7 @@
     "displayAssociations",
     "recordingOptions"
   ],
-  "additionalProperties": false,
+  "additionalProperties": true,
   "$defs": {
     "association": {
       "type": "object",

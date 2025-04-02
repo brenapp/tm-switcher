@@ -6,13 +6,16 @@ mod process;
 use anyhow::Result;
 use portable_pty::{CommandBuilder, PtySize};
 use process::{ProcessEvent, ProcessOptions};
-use tauri::{TitleBarStyle, WebviewUrl, WebviewWindowBuilder};
+use tauri::{WebviewUrl, WebviewWindowBuilder};
 use std::io::Write;
 use std::process::Command;
 use std::sync::{Arc, Mutex};
 use tauri::{ipc::Channel, AppHandle, Listener};
 use tauri_plugin_shell::ShellExt;
 use unescape::unescape;
+
+#[cfg(target_os = "macos")]
+use tauri::TitleBarStyle;
 
 #[tauri::command]
 fn begin(app: AppHandle, process: Channel<ProcessEvent>, size: PtySize) -> () {
@@ -82,7 +85,7 @@ fn main() {
             // Transparent title bar on Mac OS
             #[cfg(target_os = "macos")]
             let win_builder = win_builder.title_bar_style(TitleBarStyle::Transparent);
-            let window = win_builder.build().unwrap();
+            let window = win_builder.build()?;
 
             #[cfg(target_os = "macos")]
             {
@@ -101,7 +104,7 @@ fn main() {
                     ns_window.setBackgroundColor_(bg_color);
                 }
             }
-
+            window.show()?;
             Ok(())
         })
         .run(tauri::generate_context!())

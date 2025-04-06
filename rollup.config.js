@@ -42,13 +42,14 @@ const config = {
       ignoreDynamicRequires: true,
     }),
     injectProcessEnv({
-      SECRET_VEXTM_CLIENT_ID: process.env.SECRET_VEXTM_CLIENT_ID,
-      SECRET_VEXTM_CLIENT_SECRET: process.env.SECRET_VEXTM_CLIENT_SECRET,
-      SECRET_VEXTM_GRANT_TYPE: process.env.SECRET_VEXTM_GRANT_TYPE,
-      SECRET_VEXTM_EXPIRATION_DATE: process.env.SECRET_VEXTM_EXPIRATION_DATE,
+      TM_SWITCHER_VEX_TM_CLIENT_ID: process.env.TM_SWITCHER_VEX_TM_CLIENT_ID,
+      TM_SWITCHER_VEX_TM_CLIENT_SECRET:
+        process.env.TM_SWITCHER_VEX_TM_CLIENT_SECRET,
+      TM_SWITCHER_VEX_TM_EXPIRATION_DATE:
+        process.env.TM_SWITCHER_VEX_TM_EXPIRATION_DATE,
 
-      SECRET_LOGS_SERVER: process.env.SECRET_LOGS_SERVER,
-      SECRET_LOGS_TOKEN: process.env.SECRET_LOGS_TOKEN,
+      TM_SWITCHER_LOG_SERVER: process.env.TM_SWITCHER_LOG_SERVER,
+      TM_SWITCHER_LOG_TOKEN: process.env.TM_SWITCHER_LOG_TOKEN,
     }),
     /**
      * Emit an empty deno.json file as a sibling to the output bundle. This is

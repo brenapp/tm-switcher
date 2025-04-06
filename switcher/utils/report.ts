@@ -5,7 +5,7 @@ import { keypress } from "./keypress.js";
 
 import { version } from "~data/package.json" assert { type: "json" };
 import { getFilePaths } from "./logging.js";
-import { getLogSecrets } from "./secrets.js";
+import { getLogServerAuthorization } from "./secrets.js";
 
 
 export type IssueReportMetadata = {
@@ -57,7 +57,7 @@ export async function reportIssue(
     logs,
   ].join("\n\n--\n\n");
 
-  const secrets = getLogSecrets();
+  const secrets = getLogServerAuthorization();
 
   if (!secrets) {
     console.error("No secrets found. Cannot report issue.");

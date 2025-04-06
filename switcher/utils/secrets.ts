@@ -1,27 +1,26 @@
-export function getVEXTMSecrets() {
+export function getVEXTMAuthorization() {
     const {
-        VEXTM_SECRET_CLIENT_ID: client_id,
-        VEXTM_SECRET_CLIENT_SECRET: client_secret,
-        VEXTM_GRANT_TYPE: grant_type,
-        VEXTM_EXPIRATION_DATE: expiration_date,
+        TM_SWITCHER_VEX_TM_CLIENT_ID: client_id,
+        TM_SWITCHER_VEX_TM_CLIENT_SECRET: client_secret,
+        TM_SWITCHER_VEX_TM_EXPIRATION_DATE: expiration_date,
     } = process.env;
 
-    if (!client_id || !client_secret || !grant_type || !expiration_date) {
+    if (!client_id || !client_secret || !expiration_date) {
         return null;        
     };
 
     return {
         client_id,
         client_secret,
-        grant_type,
-        expiration_date: new Date(Number.parseInt(expiration_date)),
+        grant_type: "client_credentials",
+        expiration_date: new Date(Number.parseInt(expiration_date)).getTime(),
     } as const;
 };
 
-export function getLogSecrets() {
+export function getLogServerAuthorization() {
     const {
-        SECRET_LOGS_SERVER: server,
-        SECRET_LOGS_TOKEN: token,
+        TM_SWITCHER_LOG_SERVER: server,
+        TM_SWITCHER_LOG_TOKEN: token,
     } = process.env;
 
     if (!server || !token) {

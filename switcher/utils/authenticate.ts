@@ -3,7 +3,7 @@ import { Client } from "vex-tm-client";
 import OBSWebSocket from "obs-websocket-js";
 import { log } from "./logging.js";
 import { promptReportIssue } from "./report.js";
-import { getVEXTMSecrets } from "./secrets.js";
+import { getVEXTMAuthorization } from "./secrets.js";
 
 export type TMCredentials = {
   address: string;
@@ -125,7 +125,7 @@ export async function getCredentials(): Promise<Credentials> {
 
 export async function connectTM({ address, key }: TMCredentials) {
 
-  const authorization = getVEXTMSecrets();
+  const authorization = getVEXTMAuthorization();
   if (!authorization) {
     log(
       "error",
@@ -139,12 +139,7 @@ export async function connectTM({ address, key }: TMCredentials) {
 
   const client = new Client({
     address,
-    authorization: {
-      client_id: authorization.client_id,
-      client_secret: authorization.client_secret,
-      expiration_date: authorization.expiration_date.getTime(),
-      grant_type: "client_credentials",
-    },
+    authorization,
     clientAPIKey: key,
     bearerMargin: 30 * 60, // refresh the bearer with 30 minutes remaining
   });

@@ -3,11 +3,10 @@ import * as os from "os";
 import inquirer from "inquirer";
 import { keypress } from "./keypress.js";
 
-import { server, token } from "~data:secret/logs.json" assert { type: "json" };
 import { version } from "~data/package.json" assert { type: "json" };
 import { getFilePaths } from "./logging.js";
+import { getLogSecrets } from "./secrets.js";
 
-const DUMP_ENDPOINT = new URL("/dump", server);
 
 export type IssueReportMetadata = {
   email: string;
@@ -57,6 +56,16 @@ export async function reportIssue(
     context,
     logs,
   ].join("\n\n--\n\n");
+
+  const secrets = getLogSecrets();
+
+  if (!secrets) {
+    console.error("No secrets found. Cannot report issue.");
+    return { correlation: "" };
+  }
+  
+  const { token, server } = secrets;
+  const DUMP_ENDPOINT = new URL("/dump", server);
 
   const response = await fetch(DUMP_ENDPOINT, {
     method: "PUT",

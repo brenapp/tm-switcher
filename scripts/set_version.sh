@@ -5,7 +5,7 @@ main() {
     
     # set package.json at root
     if [ -f package.json ]; then
-        jq --arg version "$version" '.version = $version' package.json > tmp.json && mv tmp.json package.json
+        npm version "$version" --no-git-tag-version
     else
         echo "package.json not found in the current directory."
         exit 1
@@ -14,7 +14,7 @@ main() {
     # set package.json in host
     
     if [ -f host/package.json ]; then
-        jq --arg version "$version" '.version = $version' host/package.json > tmp.json && mv tmp.json host/package.json
+        npm --prefix host version "$version" --no-git-tag-version
     else
         echo "host/package.json not found in the current directory."
         exit 1

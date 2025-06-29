@@ -3,6 +3,16 @@
 main() {
     local version="$1"
     
+    if [ -z "$version" ]; then
+        echo "Usage: $0 <version>"
+        exit 1
+    fi
+
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "Git working directory is not clean. Please commit or stash your changes before proceeding."
+        exit 1
+    fi
+
     # set package.json at root
     if [ -f package.json ]; then
         npm version "$version" --no-git-tag-version
@@ -20,7 +30,7 @@ main() {
         exit 1
     fi
 
-    git add package.json host/package.json
+    git add package.json host/package.json package-lock.json host/package-lock.json
     if [ $? -ne 0 ]; then
         echo "Failed to add package.json files to git."
         exit 1

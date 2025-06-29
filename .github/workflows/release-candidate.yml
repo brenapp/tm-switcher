@@ -5,9 +5,40 @@ name: Release Candidate
 on:
   push:
     tags: 
-      - 'v*.*.*' # This will trigger the workflow on any tag that starts with v, followed by any number of digits and dots.
+     - 'v*.*.*' # This will trigger the workflow on any tag that starts with v, followed by any number of digits and dots.
+
 jobs:
-  create-release-candidate:
+  create-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - name: get version
+        run: echo "PACKAGE_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
+      - name: create release
+        id: create-release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${process.env.PACKAGE_VERSION}`,
+              name: `TM Switcher v${process.env.PACKAGE_VERSION}`,
+              body: '',
+              draft: true,
+              prerelease: false
+            })
+            return data.id
+  
+  build:
     permissions:
       contents: write
     strategy:
@@ -22,7 +53,7 @@ jobs:
             args: ''
           - platform: 'windows-latest'
             args: ''
-
+    needs: create-release
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -81,12 +112,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          appName: 'TM Switcher'
-          releaseName: 'TM Switcher v__VERSION__'
-          tagName: 'v__VERSION__'
-          releaseBody: 'See the assets to download this version and install.'
-          releaseDraft: true
-          includeUpdaterJson: false
-          prerelease: false
           projectPath: ./host
+          releaseId: ${{ needs.create-release.outputs.release_id }}
+          appName: 'TM Switcher'
+          tagName: 'v__VERSION__'
+          includeUpdaterJson: true
+          prerelease: true
+          releaseDraft: true
           args: ${{ matrix.args }}

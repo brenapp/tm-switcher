@@ -8,6 +8,11 @@ main() {
         exit 1
     fi
 
+    if [ -n "$(git status --porcelain)" ]; then
+        echo "Git working directory is not clean. Please commit or stash your changes before proceeding."
+        exit 1
+    fi
+
     # set package.json at root
     if [ -f package.json ]; then
         npm version "$version" --no-git-tag-version

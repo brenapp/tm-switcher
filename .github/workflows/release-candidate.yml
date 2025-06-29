@@ -112,12 +112,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
+          projectPath: ./host
           releaseId: ${{ needs.create-release.outputs.release_id }}
           appName: 'TM Switcher'
-          releaseName: 'TM Switcher v__VERSION__'
           tagName: 'v__VERSION__'
-          releaseDraft: true
           includeUpdaterJson: true
           prerelease: true
-          projectPath: ./host
+          releaseDraft: true
           args: ${{ matrix.args }}

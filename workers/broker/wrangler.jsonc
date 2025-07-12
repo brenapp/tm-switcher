@@ -1,0 +1,18 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "vextm-broker",
+	"main": "src/index.ts",
+	"routes": [
+		{
+			"pattern": "broker.vextm.bren.app",
+			"custom_domain": true
+		}
+	],
+	"observability": {
+		"enabled": true
+	},
+	"compatibility_date": "2025-07-11",
+	"compatibility_flags": [
+		"nodejs_compat"
+	]
+}

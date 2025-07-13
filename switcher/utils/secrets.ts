@@ -1,20 +1,31 @@
-export function getVEXTMAuthorization() {
-    const {
-        TM_SWITCHER_VEX_TM_CLIENT_ID: client_id,
-        TM_SWITCHER_VEX_TM_CLIENT_SECRET: client_secret,
-        TM_SWITCHER_VEX_TM_EXPIRATION_DATE: expiration_date,
-    } = process.env;
+import createClient from "openapi-fetch";
+import type { paths } from "../generated/broker";
+import { BearerResult, TMErrors } from "vex-tm-client";
 
-    if (!client_id || !client_secret || !expiration_date) {
-        return null;        
-    };
+const client = createClient<paths>({ baseUrl: process.env.TM_SWITCHER_BROKER_SERVER });
+
+export async function getTournamentManagerBearer(): Promise<BearerResult> {
+    const bearer = await client.GET("/api/v1/bearer", {});
+    if (!bearer.data) {
+        return {
+            success: false,
+            error: TMErrors.CredentialsError,
+            error_details: bearer.error,
+        };
+    }
+
+    if (bearer.data.success) {
+        return {
+            success: true,
+            token: bearer.data.token,
+        };
+    }
 
     return {
-        client_id,
-        client_secret,
-        grant_type: "client_credentials",
-        expiration_date: new Date(Number.parseInt(expiration_date)).getTime(),
-    } as const;
+        success: false,
+        error: bearer.data.error as TMErrors.CredentialsExpired | TMErrors.CredentialsInvalid | TMErrors.CredentialsError,
+        error_details: bearer.data.error_details,
+    };
 };
 
 export function getLogServerAuthorization() {

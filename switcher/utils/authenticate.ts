@@ -3,7 +3,7 @@ import { Client } from "vex-tm-client";
 import OBSWebSocket from "obs-websocket-js";
 import { log } from "./logging.js";
 import { promptReportIssue } from "./report.js";
-import { getVEXTMAuthorization } from "./secrets.js";
+import { getTournamentManagerBearer as getBearer } from "./secrets.js";
 
 export type TMCredentials = {
   address: string;
@@ -125,21 +125,11 @@ export async function getCredentials(): Promise<Credentials> {
 
 export async function connectTM({ address, key }: TMCredentials) {
 
-  const authorization = getVEXTMAuthorization();
-  if (!authorization) {
-    log(
-      "error",
-      `Tournament Manager: Missing VEX TM credentials`,
-      `❌ Tournament Manager: Missing VEX TM credentials`
-    );
-
-    await promptReportIssue(`Missing VEX TM credentials`);
-    process.exit(1);
-  }
-
   const client = new Client({
     address,
-    authorization,
+    manualAuthorization: {
+      getBearer
+    },
     clientAPIKey: key,
     bearerMargin: 30 * 60, // refresh the bearer with 30 minutes remaining
   });

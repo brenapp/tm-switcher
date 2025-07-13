@@ -42,12 +42,6 @@ const config = {
       ignoreDynamicRequires: true,
     }),
     injectProcessEnv({
-      TM_SWITCHER_VEX_TM_CLIENT_ID: process.env.TM_SWITCHER_VEX_TM_CLIENT_ID,
-      TM_SWITCHER_VEX_TM_CLIENT_SECRET:
-        process.env.TM_SWITCHER_VEX_TM_CLIENT_SECRET,
-      TM_SWITCHER_VEX_TM_EXPIRATION_DATE:
-        process.env.TM_SWITCHER_VEX_TM_EXPIRATION_DATE,
-
       TM_SWITCHER_LOG_SERVER: process.env.TM_SWITCHER_LOG_SERVER,
       TM_SWITCHER_LOG_TOKEN: process.env.TM_SWITCHER_LOG_TOKEN,
     }),

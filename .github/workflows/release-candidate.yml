@@ -39,6 +39,11 @@ jobs:
             return data.id
   
   build:
+    env:
+      TM_SWITCHER_BROKER_SERVER: ${{ secrets.TM_SWITCHER_BROKER_SERVER }}
+      TM_SWITCHER_BROKER_TOKEN: ${{ secrets.TM_SWITCHER_BROKER_TOKEN }}
+      TM_SWITCHER_LOG_SERVER: ${{ secrets.TM_SWITCHER_LOG_SERVER }}
+      TM_SWITCHER_LOG_TOKEN: ${{ secrets.TM_SWITCHER_LOG_TOKEN }}
     permissions:
       contents: write
     strategy:

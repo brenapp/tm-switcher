@@ -25,6 +25,23 @@ const generateDenoJson = {
 /**
  * @type {import('rollup').RollupOptions}
  */
+const VARIABLES = [
+  "TM_SWITCHER_LOG_SERVER",
+  "TM_SWITCHER_LOG_TOKEN",
+  "TM_SWITCHER_BROKER_SERVER",
+  "TM_SWITCHER_BROKER_TOKEN",
+];
+
+const missingVars = VARIABLES.filter(
+  (key) => !process.env[key] || process.env[key] === ""
+);
+
+if (missingVars.length > 0) {
+  throw new Error(
+    `Missing required environment variables: ${missingVars.join(", ")}`
+  );
+}
+
 const config = {
   input: "./switcher/main.ts",
   plugins: [
@@ -41,12 +58,9 @@ const config = {
     commonjs({
       ignoreDynamicRequires: true,
     }),
-    injectProcessEnv({
-      TM_SWITCHER_LOG_SERVER: process.env.TM_SWITCHER_LOG_SERVER,
-      TM_SWITCHER_LOG_TOKEN: process.env.TM_SWITCHER_LOG_TOKEN,
-      TM_SWITCHER_BROKER_SERVER: process.env.TM_SWITCHER_BROKER_SERVER,
-      TM_SWITCHER_BROKER_TOKEN: process.env.TM_SWITCHER_BROKER_TOKEN,
-    }),
+    injectProcessEnv(
+      Object.fromEntries(VARIABLES.map((key) => [key, process.env[key]]))
+    ),
     /**
      * Emit an empty deno.json file as a sibling to the output bundle. This is
      * to prevent deno compile from guamlessly trying to include node_modules

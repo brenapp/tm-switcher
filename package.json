@@ -22,7 +22,7 @@
     "chalk": "^4.1.2",
     "inquirer": "^7.3.3",
     "obs-websocket-js": "^5.0.1",
-    "vex-tm-client": "^1.4.1"
+    "vex-tm-client": "^1.5.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.2",

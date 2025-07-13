@@ -18,7 +18,7 @@
 	"dependencies": {
 		"@hono/zod-validator": "^0.4.3",
 		"hono-openapi": "^0.4.8",
-		"vex-tm-client": "^1.4.1",
+		"vex-tm-client": "^1.5.0",
 		"zod": "^3.25.76",
 		"zod-openapi": "^4.2.4"
 	}

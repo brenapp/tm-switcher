@@ -76,5 +76,6 @@
       "~data:schema/*.json": ["../schemas/*.json"],
       "~data/package.json": ["../package.json"]
     }
-  }
+  },
+  "exclude": ["workers"]
 }

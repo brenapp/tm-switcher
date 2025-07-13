@@ -1,18 +1,25 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "vextm-broker",
-	"main": "src/index.ts",
-	"routes": [
-		{
-			"pattern": "broker.vextm.bren.app",
-			"custom_domain": true
-		}
-	],
-	"observability": {
-		"enabled": true
-	},
-	"compatibility_date": "2025-07-11",
-	"compatibility_flags": [
-		"nodejs_compat"
-	]
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "vextm-broker",
+  "main": "src/index.ts",
+  "routes": [
+    {
+      "pattern": "broker.vextm.bren.app",
+      "custom_domain": true
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "TOKENS",
+      "id": "2815919dd73640b1ad9d7160372bedf4"
+    }
+  ],
+  "analytics_engine_datasets": [
+    { "binding": "VEXTM_BROKER_ANALYTICS", "dataset": "vextm-broker" }
+  ],
+  "observability": {
+    "enabled": true
+  },
+  "compatibility_date": "2025-07-11",
+  "compatibility_flags": ["nodejs_compat"]
 }

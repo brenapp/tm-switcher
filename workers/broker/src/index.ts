@@ -7,6 +7,14 @@ import { Client, TMErrors } from "vex-tm-client";
 
 const app = new Hono<{ Bindings: Env }>();
 
+const tokenDataSchema = z.object({
+	active: z.boolean(),
+	clientId: z.string(),
+});
+
+const headerSchema = z.object({
+	Authorization: z.string(),
+});
 const querySchema = z.object({});
 
 const bearerTokenSchema = z.object({
@@ -46,10 +54,66 @@ app.get(
 					},
 				},
 			},
-		},
+			400: {
+				description: "Bad request, likely due to missing or malformed Authorization header.",
+				content: {
+					"application/json": {
+						schema: resolver(bearerResultErrorSchema),
+					},
+				},
+			},
+			403: {
+				description: "Forbidden, invalid broker token.",
+				content: {
+					"application/json": {
+						schema: resolver(bearerResultErrorSchema),
+					},
+				},
+			},
+		}
 	}),
+	validator("header", headerSchema),
 	validator("query", querySchema),
 	async (c) => {
+
+		const authorization = c.req.header("Authorization");
+		if (!authorization) {
+			return c.json(
+				{
+					success: false,
+					error: TMErrors.CredentialsError,
+					error_details: "Authorization header is missing.",
+				},
+				400
+			);
+		}
+
+		const match = authorization.match(/^Bearer\s+(.+)$/);
+		if (!match) {
+			return c.json(
+				{
+					success: false,
+					error: TMErrors.CredentialsError,
+					error_details: "Authorization header is not in the correct format.",
+				},
+				400
+			);
+		}	
+
+
+		const token = match[1];
+		const data = c.env.TOKENS.get<z.infer<typeof tokenDataSchema>>(token, "json");
+		if (!data) {
+			return c.json(
+				{
+					success: false,
+					error: TMErrors.CredentialsError,
+					error_details: "Invalid broker token. You may be using an outdated version.",
+				},
+				403
+			);
+		}
+
 		const client = new Client({
 			address: "",
 			clientAPIKey: "",
@@ -64,7 +128,7 @@ app.get(
 		});
 
 		const result = await client.getBearer();
-		return c.json(result satisfies z.infer<typeof responseSchema>);
+		return c.json(result satisfies z.infer<typeof responseSchema>, 200);
 	}
 );
 app.get(

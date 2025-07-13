@@ -36,7 +36,9 @@ export interface operations {
     getApiV1Bearer: {
         parameters: {
             query?: never;
-            header?: never;
+            header: {
+                Authorization: string;
+            };
             path?: never;
             cookie?: never;
         };
@@ -57,6 +59,34 @@ export interface operations {
                             expires_in: number;
                         };
                     } | {
+                        /** @constant */
+                        success: false;
+                        error: "Could not obtain a bearer token from DWAB server" | "DWAB Third-Party Authorization Credentials are invalid" | "DWAB Third-Party Authorization Credentials have expired";
+                        error_details?: unknown;
+                    };
+                };
+            };
+            /** @description Bad request, likely due to missing or malformed Authorization header. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: false;
+                        error: "Could not obtain a bearer token from DWAB server" | "DWAB Third-Party Authorization Credentials are invalid" | "DWAB Third-Party Authorization Credentials have expired";
+                        error_details?: unknown;
+                    };
+                };
+            };
+            /** @description Forbidden, invalid broker token. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
                         /** @constant */
                         success: false;
                         error: "Could not obtain a bearer token from DWAB server" | "DWAB Third-Party Authorization Credentials are invalid" | "DWAB Third-Party Authorization Credentials have expired";

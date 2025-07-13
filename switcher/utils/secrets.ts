@@ -5,7 +5,14 @@ import { BearerResult, TMErrors } from "vex-tm-client";
 const client = createClient<paths>({ baseUrl: process.env.TM_SWITCHER_BROKER_SERVER });
 
 export async function getTournamentManagerBearer(): Promise<BearerResult> {
-    const bearer = await client.GET("/api/v1/bearer", {});
+    const bearer = await client.GET("/api/v1/bearer", {
+        params: {
+            header: {
+                Authorization: `Bearer ${process.env.TM_SWITCHER_BROKER_TOKEN}`,
+            }
+        }
+    });
+    
     if (!bearer.data) {
         return {
             success: false,

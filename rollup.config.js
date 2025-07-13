@@ -44,6 +44,8 @@ const config = {
     injectProcessEnv({
       TM_SWITCHER_LOG_SERVER: process.env.TM_SWITCHER_LOG_SERVER,
       TM_SWITCHER_LOG_TOKEN: process.env.TM_SWITCHER_LOG_TOKEN,
+      TM_SWITCHER_BROKER_SERVER: process.env.TM_SWITCHER_BROKER_SERVER,
+      TM_SWITCHER_BROKER_TOKEN: process.env.TM_SWITCHER_BROKER_TOKEN,
     }),
     /**
      * Emit an empty deno.json file as a sibling to the output bundle. This is

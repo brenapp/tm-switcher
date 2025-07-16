@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { swaggerUI } from "@hono/swagger-ui";
 import { describeRoute, openAPISpecs } from "hono-openapi";
 import { resolver, validator } from "hono-openapi/zod";
 import { z } from "zod";
@@ -143,6 +144,10 @@ app.get(
 		},
 	})
 );
+
+app.get("/", swaggerUI({
+	url: "/openapi",
+}))
 
 export default {
 	...app,

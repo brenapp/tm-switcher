@@ -16,6 +16,7 @@
 		"wrangler": "^4.24.3"
 	},
 	"dependencies": {
+		"@hono/swagger-ui": "^0.5.2",
 		"@hono/zod-validator": "^0.4.3",
 		"hono-openapi": "^0.4.8",
 		"vex-tm-client": "^1.5.0",

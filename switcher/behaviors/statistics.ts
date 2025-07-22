@@ -1,3 +1,4 @@
+import { promptReportIssue } from "../utils/report.js";
 import { log } from "../utils/logging.js";
 import { Behavior } from "../behavior.js";
 import { brokerClient } from "../utils/secrets.js";
@@ -27,7 +28,8 @@ export const StatisticsBehavior: Behavior = async ({ connections }) => {
     })
 
     if (!statsResult.data?.success) {
-        log("error", `Failed to record statistics: ${statsResult.error}`);
+        log("error", `Failed to record statistics: ${JSON.stringify(statsResult.error, null, 2)}`);
+        await promptReportIssue(JSON.stringify(statsResult, null, 2));
         return;
     }
 };

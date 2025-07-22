@@ -1,6 +1,6 @@
 {
   "name": "tm-switcher",
-  "version": "1.11.14",
+  "version": "1.11.15",
   "main": "src/main.ts",
   "bin": "out/switcher/main.cjs",
   "type": "module",

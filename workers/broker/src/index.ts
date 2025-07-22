@@ -37,7 +37,7 @@ const bearerResultErrorSchema = z.object({
 	]),
 	error_details: z.unknown().optional(),
 });
-const responseSchema = z.union([
+const bearerResponseSchema = z.union([
 	bearerResultSuccessSchema,
 	bearerResultErrorSchema,
 ]);
@@ -51,7 +51,7 @@ app.get(
 				description: "Bearer token obtained successfully.",
 				content: {
 					"application/json": {
-						schema: resolver(responseSchema),
+						schema: resolver(bearerResponseSchema),
 					},
 				},
 			},
@@ -129,9 +129,68 @@ app.get(
 		});
 
 		const result = await client.getBearer();
-		return c.json(result satisfies z.infer<typeof responseSchema>, 200);
+		return c.json(result satisfies z.infer<typeof bearerResponseSchema>, 200);
 	}
 );
+
+const eventSchema = z.object({
+    name: z.string(),
+    sku: z.string(),
+});
+
+const productSchema = z.enum(["tm-switcher"]);
+
+const statsPointSchema = z.object({
+    timestamp: z.date(),
+    event: eventSchema,
+    product: productSchema,
+});
+
+const statsResponseSchema = z.object({
+    success: z.literal(true),
+});
+
+app.put(
+    "/api/v1/stats",
+    validator("json", statsPointSchema),
+    describeRoute({
+        description: "Record statistics about usage.",
+        responses: {
+            200: {
+                description: "Bearer token obtained successfully.",
+                content: {
+                    "application/json": {
+                        schema: resolver(statsResponseSchema),
+                    },
+                },
+            }
+        }
+    }),
+    async (c) => {
+        const cf = c.req.raw.cf;
+        const body = c.req.valid("json");
+        c.env.VEXTM_BROKER_ANALYTICS.writeDataPoint({
+            blobs: [
+                `${cf?.country}`,
+                `${cf?.region}`,
+                `${cf?.city}`,
+                `${cf?.postalCode}`,
+                body.event.sku,
+                body.event.name,
+            ],
+            doubles: [
+                body.timestamp.getTime(),
+                cf?.latitude ? Number.parseInt(`${cf.latitude}`) : 0,
+                cf?.longitude ? Number.parseInt(`${cf.longitude}`) : 0,
+            ],
+            indexes: [
+                body.product
+            ]
+        });
+        return c.json({ success: true } satisfies z.infer<typeof statsResponseSchema>);
+    }
+);
+
 app.get(
 	"/openapi",
 	openAPISpecs(app, {

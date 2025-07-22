@@ -30,7 +30,19 @@ main() {
         exit 1
     fi
 
-    git add package.json host/package.json package-lock.json host/package-lock.json
+    # Set Cargo.toml in host
+    if [ -f host/src-tauri/Cargo.toml ]; then
+        sed -i '' "s/^version = \".*\"/version = \"$version\"/" host/src-tauri/Cargo.toml
+        if [ $? -ne 0 ]; then
+            echo "Failed to update version in host/src-tauri/Cargo.toml."
+            exit 1
+        fi
+    else
+        echo "host/src-tauri/Cargo.toml not found."
+        exit 1
+    fi
+
+    git add package.json host/package.json package-lock.json host/package-lock.json host/src-tauri/Cargo.toml
     if [ $? -ne 0 ]; then
         echo "Failed to add package.json files to git."
         exit 1

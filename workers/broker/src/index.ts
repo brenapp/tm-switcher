@@ -141,9 +141,15 @@ const eventSchema = z.object({
 const productSchema = z.enum(["tm-switcher"]);
 
 const statsPointSchema = z.object({
-    timestamp: z.date(),
-    event: eventSchema,
-    product: productSchema,
+	timestamp: z.preprocess((val) => {
+		if (typeof val === "string" || typeof val === "number") {
+			const date = new Date(val);
+			return isNaN(date.getTime()) ? undefined : date;
+		}
+		return val;
+	}, z.date()),
+	event: eventSchema,
+	product: productSchema,
 });
 
 const statsResponseSchema = z.object({

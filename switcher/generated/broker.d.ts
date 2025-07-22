@@ -21,6 +21,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/stats/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** @description Record statistics about usage. */
+        put: operations["putApiV1StatsStart"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -91,6 +108,41 @@ export interface operations {
                         success: false;
                         error: "Could not obtain a bearer token from DWAB server" | "DWAB Third-Party Authorization Credentials are invalid" | "DWAB Third-Party Authorization Credentials have expired";
                         error_details?: unknown;
+                    };
+                };
+            };
+        };
+    };
+    putApiV1StatsStart: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    timestamp: string;
+                    event: {
+                        name: string;
+                        sku: string;
+                    };
+                    /** @enum {string} */
+                    product: "tm-switcher";
+                };
+            };
+        };
+        responses: {
+            /** @description Bearer token obtained successfully. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @constant */
+                        success: true;
                     };
                 };
             };

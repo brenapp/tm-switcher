@@ -151,7 +151,7 @@ const statsResponseSchema = z.object({
 });
 
 app.put(
-    "/api/v1/stats",
+    "/api/v1/stats/start",
     validator("json", statsPointSchema),
     describeRoute({
         description: "Record statistics about usage.",

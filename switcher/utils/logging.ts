@@ -1,6 +1,6 @@
 import { networkInterfaces, tmpdir } from "os";
 import { join } from "path";
-import { FileHandle, open } from "fs/promises";
+import { FileHandle, open, mkdir } from "fs/promises";
 
 import { version } from "~data/package.json" assert { type: "json" };
 
@@ -34,8 +34,38 @@ export type FilePaths = {
   configPath: string;
 };
 
+export const productName = "TM Switcher"
+
+export function getSwitcherFolder() {
+  switch (process.platform) {
+    case "win32":
+      return join(process.env.APPDATA || tmpdir(), productName);
+    case "darwin":
+      return join(
+        process.env.HOME || tmpdir(),
+        "Library",
+        "Application Support",
+        productName
+      );
+    case "linux":
+    default:
+      return join(
+        process.env.XDG_CONFIG_HOME ||
+          join(process.env.HOME || tmpdir(), ".config"),
+        productName
+      );
+  }
+}
+
+export function getSwitcherDataFolder() {
+  return join(getSwitcherFolder(), "data");
+}
+
 export async function getFilePaths(): Promise<FilePaths> {
-  const directory = tmpdir();
+  const directory = getSwitcherDataFolder();
+
+  // Ensure the directory exists
+  await mkdir(directory, { recursive: true, mode: 0o700 });
 
   const date = new Date();
   const timestamp = [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-")

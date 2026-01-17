@@ -4,6 +4,7 @@ import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import { typescriptPaths } from "rollup-plugin-typescript-paths";
 import injectProcessEnv from "rollup-plugin-inject-process-env";
+import copy from "rollup-plugin-copy";
 
 import "dotenv/config";
 
@@ -59,7 +60,7 @@ const config = {
       ignoreDynamicRequires: true,
     }),
     injectProcessEnv(
-      Object.fromEntries(VARIABLES.map((key) => [key, process.env[key]]))
+      Object.fromEntries(VARIABLES.map((key) => [key, process.env[key]])),
     ),
     /**
      * Emit an empty deno.json file as a sibling to the output bundle. This is
@@ -68,6 +69,14 @@ const config = {
      * binary.
      **/
     generateDenoJson,
+    copy({
+      targets: [
+        {
+          src: "node_modules/@julusian/freetype2/prebuilds/*",
+          dest: "./out/switcher/prebuilds",
+        },
+      ],
+    }),
   ],
   output: {
     file: "./out/switcher/main.cjs",

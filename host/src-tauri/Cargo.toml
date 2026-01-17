@@ -1,6 +1,6 @@
 [package]
 name = "tm-switcher-host"
-version = "1.12.1"
+version = "1.12.2"
 description = "Desktop Host for TM Switcher"
 authors = ["Brendan McGuire <brendan@bren.app>"]
 edition = "2021"

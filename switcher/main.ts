@@ -2,9 +2,15 @@ import {
   getCredentials,
   connectTM,
   connectOBS,
+  connectATEM,
 } from "./utils/authenticate.js";
 import {
+  getAssociations,
+  getAudienceDisplayOptions,
+  getDisplayAssociations,
+  getRecordingOptions,
   getSwitcherOptions,
+  getTournamentAttachments,
 } from "./utils/input.js";
 import { Behavior } from "./behavior.js";
 import { getFilePaths, initLogFile, log, setLogFile } from "./utils/logging.js";
@@ -63,10 +69,14 @@ async function main() {
     log("info", "Connected to OBS", `✅ OBS`);
   }
 
+  const atem = await connectATEM(creds.atem);
+  if (atem) {
+    log("info", "Connected to ATEM", "✅ ATEM");
+  }
 
   console.log("");
 
-  const connections = { tm, obs };
+  const connections = { tm, obs, atem };
 
   const options = await getSwitcherOptions(paths.configPath, connections);
   saveOptions(paths.configPath, options);

@@ -6,12 +6,14 @@ import {
   Fieldset,
   FieldsetAudienceDisplay,
 } from "vex-tm-client";
+
+import { Atem } from "atem-connection";
 import OBSWebSocket from "obs-websocket-js";
+import { keypress } from "./keypress.js";
 import { log } from "./logging.js";
 import { promptReportIssue } from "./report.js";
 import { deserializeOptions, getOptions } from "./options.js";
 import { SwitcherConnections } from "../behavior.js";
-import { keypress } from "./keypress.js";
 
 
 export type TournamentAttachments = {
@@ -120,6 +122,7 @@ export type FieldAssociations = Record<string, Association | undefined>;
 export async function getAssociations(
   fieldset: Fieldset,
   obs: ObsWebSocket | null,
+  atem: Atem | null
 ): Promise<FieldAssociations> {
   const fields = await fieldset.getFields();
   if (!fields.success) {
@@ -153,6 +156,25 @@ export async function getAssociations(
       });
     }
 
+    if (atem && atem.state) {
+      const inputs = Object.entries(atem.state?.inputs);
+      const defaultValue = Number.parseInt(
+        inputs.find(
+          ([value, input]) =>
+            input?.shortName.toLowerCase() === field.name.toLowerCase()
+        )?.[0] ?? "NaN"
+      );
+      questions.push({
+        name: "atem",
+        type: "list",
+        message: `What ATEM input do you want to associate with ${field.name}? `,
+        choices: inputs.map(([value, input]) => ({
+          name: input?.shortName,
+          value: Number.parseInt(value),
+        })),
+        default: isNaN(defaultValue) ? undefined : defaultValue,
+      });
+    }
 
     const response = await inquirer.prompt<Association>(questions);
     associations[field.id] = response;
@@ -181,6 +203,7 @@ const MODES = [
 
 export async function getDisplayAssociations(
   obs: ObsWebSocket | null,
+  atem: Atem | null
 ): Promise<DisplayAssociations> {
   const associations: DisplayAssociations = {
     [FieldsetAudienceDisplay.Blank]: undefined,
@@ -198,8 +221,9 @@ export async function getDisplayAssociations(
   };
 
   const obsScenes = (await obs?.call("GetSceneList")) ?? { scenes: [] };
+  const atemInputs = Object.entries(atem?.state?.inputs ?? {});
 
-  if (obsScenes.scenes.length < 2) {
+  if (obsScenes.scenes.length < 2 && atemInputs.length < 2) {
     return associations;
   }
 
@@ -238,6 +262,21 @@ export async function getDisplayAssociations(
         default: defaultValue,
         choices: [
           ...obsScenes.scenes.map((s) => s.sceneName as string),
+          { name: "No Association", value: undefined },
+        ],
+      });
+    }
+
+    if (atemInputs.length > 1) {
+      questions.push({
+        type: "list",
+        name: "atem",
+        message: `${mode} ATEM Input? `,
+        choices: [
+          ...atemInputs.map(([value, input]) => ({
+            name: input?.shortName,
+            value: Number.parseInt(value),
+          })),
           { name: "No Association", value: undefined },
         ],
       });
@@ -325,11 +364,10 @@ export async function getSwitcherOptions(configPath: string, connections: Switch
   }
 
   const attachments = await getTournamentAttachments(connections.tm);
-  const associations = await getAssociations(attachments.fieldset, connections.obs);
-  const displayAssociations = await getDisplayAssociations(connections.obs);
+  const associations = await getAssociations(attachments.fieldset, connections.obs, connections.atem);
+  const displayAssociations = await getDisplayAssociations(connections.obs, connections.atem);
   const audienceDisplayOptions = await getAudienceDisplayOptions();
   const recordingOptions = await getRecordingOptions(connections.obs);
 
   return { attachments, associations, displayAssociations, audienceDisplayOptions, recordingOptions };
 };
-

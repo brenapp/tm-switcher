@@ -1,3 +1,4 @@
+import { Atem } from "atem-connection";
 import OBSWebSocket from "obs-websocket-js";
 import { Credentials } from "./utils/authenticate.js";
 import {
@@ -22,6 +23,7 @@ export type SwitcherOptions = {
 export type SwitcherConnections = {
   tm: Client;
   obs: OBSWebSocket | null;
+  atem: Atem | null;
 };
 
 export type SwitcherSession = {

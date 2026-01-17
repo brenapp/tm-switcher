@@ -88,8 +88,8 @@ jobs:
 
       - name: npm ci
         run: | 
-          npm ci --omit=optional
-          npm --prefix host ci --omit=optional
+          npm ci
+          npm --prefix host ci 
       
       - name: npm switcher:build
         run: |
